@@ -1,0 +1,98 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --paper-scene-bg: #f5f8f0;
+  --paper-board: #b8c9a7;
+  --paper-board-dark: #76906a;
+  --paper-pencil: #92400e;
+  --paper-ink: #21324a;
+  --paper-muted: #68778f;
+  --paper-axis: #d7deea;
+}
+
+.portrait-lab canvas,
+.evolution-lab canvas,
+.motivation-lab canvas,
+.attention-story canvas {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  background: var(--paper-scene-bg);
+  touch-action: none;
+}
+
+.paper-figure {
+  overflow: hidden;
+  background: #f7f3ea;
+}
+
+.paper-figure img {
+  display: block;
+  animation: sapiens-asset-drift 9s ease-in-out infinite alternate;
+}
+
+.result-heading {
+  display: grid;
+  gap: 5px;
+  margin: 12px 0;
+  color: var(--paper-ink);
+}
+
+.result-heading span,
+.result-card p {
+  color: var(--paper-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(164px, 1fr));
+  gap: 10px;
+}
+
+.result-card {
+  min-height: 148px;
+  padding: 13px;
+  border: 1px solid var(--paper-axis);
+  border-radius: 10px;
+  background: #fffdf8;
+}
+
+.result-card-top,
+.result-card-top b {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  color: var(--paper-ink);
+  font-size: 13px;
+}
+
+.result-card-top .higher { color: #228d5c; }
+.result-card-top .lower { color: #27446e; }
+
+.result-score {
+  margin-top: 12px;
+  color: var(--paper-ink);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.result-protocol {
+  margin-top: 4px;
+  color: var(--paper-board-dark);
+  font-size: 12px;
+}
+
+.result-card p { margin: 9px 0 0; }
+
+@keyframes sapiens-asset-drift {
+  from { transform: scale(1); }
+  to { transform: scale(1.025) translateX(-0.5%); }
+}

@@ -16,5 +16,23 @@
     "skillVersion": "1.0.0",
     "status": "published",
     "tutorialUrl": "papers/elf_embedded_language_flows/"
+  },
+  {
+    "paperName": "sapiens2",
+    "title": "Sapiens 2",
+    "authors": [],
+    "year": null,
+    "venue": "",
+    "paperUrl": "https://arxiv.org/abs/2604.21681",
+    "participants": [
+      {
+        "name": "piziqian",
+        "github": "chenshi12-12"
+      }
+    ],
+    "topics": [],
+    "skillVersion": "1.3.0",
+    "status": "review",
+    "tutorialUrl": "papers/sapiens2/"
   }
 ]
