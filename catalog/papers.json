@@ -16,5 +16,32 @@
     "skillVersion": "1.0.0",
     "status": "published",
     "tutorialUrl": "papers/elf_embedded_language_flows/"
+  },
+  {
+    "paperName": "optimize_anything_a_universal_api_for_optimizing_any_text_parameter",
+    "title": "optimize_anything: A Universal API for Optimizing any Text Parameter",
+    "authors": [
+      "Lakshya A Agrawal",
+      "Donghyun Lee",
+      "Shangyin Tan"
+    ],
+    "year": 2026,
+    "venue": "CAIS 2026",
+    "paperUrl": "https://arxiv.org/pdf/2605.19633",
+    "participants": [
+      {
+        "name": "林盛森",
+        "github": "le-77-rrg"
+      }
+    ],
+    "topics": [
+      "LLM optimization",
+      "text artifacts",
+      "Pareto search",
+      "agent systems"
+    ],
+    "skillVersion": "1.3.0",
+    "status": "review",
+    "tutorialUrl": "papers/optimize_anything_a_universal_api_for_optimizing_any_text_parameter/"
   }
 ]

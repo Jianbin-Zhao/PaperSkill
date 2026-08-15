@@ -1,0 +1,17 @@
+/* Paper-specific overrides. This is the ONLY stylesheet the generator edits.
+   Keep the semantic color roles from tokens.css stable (see contract.md §5):
+   --blue = guidance/current, --green = success/paper method, --red = failure/old,
+   --orange = emphasis, --purple = auxiliary. Only append metaphor scene colors
+   or tune scene backgrounds here. Do NOT rewrite tokens.css / components.css. */
+
+:root {
+  --scene-bg: #f5f8f0;
+  --scene-light: #b8c9a7;
+  --scene-dark: #76906a;
+  --scene-route: #92400e;
+  --scene-current: #27446e;
+  --scene-success: #228d5c;
+  --scene-failure: #c43f52;
+  --scene-emphasis: #d97706;
+  --scene-aux: #7c3aed;
+}
