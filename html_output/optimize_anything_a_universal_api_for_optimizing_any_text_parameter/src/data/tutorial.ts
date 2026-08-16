@@ -6,7 +6,7 @@ export const tutorial: TutorialData = {
     "titleZh": "中文交互式论文教程",
     "venue": "CAIS 2026 · arXiv:2605.19633",
     "authors": "Lakshya A Agrawal, Donghyun Lee, Shangyin Tan, Wenjie Ma, Karim Elmaaroufi, Rohit Sandadi, Sanjit A. Seshia, Koushik Sen, Dan Klein, Ion Stoica, Joseph E. Gonzalez, Omar Khattab, Alexandros G. Dimakis, Matei Zaharia",
-    "affiliation": "UC Berkeley · Databricks · UT Austin 等",
+    "affiliation": "UC Berkeley · MIT",
     "domain": "LLM-based Text Optimization",
     "coreProblem": "Prompt、代码、Agent、调度策略乃至 SVG 都能写成文本，但传统优化器往往绑定对象类型与任务。能否只换 evaluator，就复用同一套搜索循环？",
     "coreInsight": "论文把候选统一成 <mark class=\"oa-key\">Text Artifact</mark>，把领域目标封装进 Evaluator，再用 Score 与 Side Information 驱动 Reflection、Mutation 和 Pareto 搜索。真正的核心不是“LLM 随便改文本”，而是用一个 <mark class=\"oa-key\">统一</mark> 接口持续、可诊断地 <mark class=\"oa-key warm\">优化</mark> 可评价的文本候选。",
@@ -82,7 +82,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "2.3",
           "title": "把领域问题压缩成同一个函数接口",
-          "desc": "当 Text Artifact 与 Evaluator 配对后，不同任务都呈现为同一种输入输出关系：评估文本候选解，返回分数与诊断信息，再寻找更好的候选。领域知识仍由各自的 Evaluator 负责。",
+          "desc": "当 Text Artifact 与 Evaluator 配对后，不同任务都呈现为同一种输入输出关系：评估文本候选解，返回分数与可选诊断信息，再寻找更好的候选。领域知识仍由各自的 Evaluator 负责。",
           componentId: "optimize-anything-lab"
         }
       ],
@@ -113,7 +113,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "3.2",
           "title": "用户声明 what，框架接管 how",
-          "desc": "展开完整签名可以看到 <code>dataset</code>、<code>valset</code>、<code>background</code> 和 <code>config</code> 等可选信息。它们补充任务、验证集、领域知识与运行设置；用户不需要再编写 mutation prompt、候选选择规则或搜索流程。",
+          "desc": "接口还可以接收 <code>dataset</code>、<code>valset</code>、<code>background</code> 和 <code>config</code> 等可选信息。它们补充任务、验证集、领域知识与运行设置；用户不需要再编写 mutation prompt、候选选择规则或搜索流程。",
           componentId: "optimize-anything-lab"
         }
       ],
@@ -199,7 +199,7 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "6.2",
           "title": "Pareto Frontier：只删除被全面超过的候选",
-          "desc": "点击任一候选，检查是否存在另一个候选在所有维度都不差、并且至少一个维度更好。只有满足这个条件，前者才会被支配。论文按 per-task 或 SI 中的 per-metric 子分数维护这种多维比较。",
+          "desc": "点击任一候选，检查是否存在另一个候选在所有维度都不差、并且至少一个维度更好。只有满足这个条件，前者才会被支配。论文按 per-task、per-example 或 SI 中的 per-metric 子分数维护多维比较；默认 GEPA 后端再按 Frontier frequency 选择父本，并用 2–3 个样例的 minibatch 聚焦下一次 Reflection。",
           componentId: "optimize-anything-lab"
         }
       ],
@@ -212,7 +212,7 @@ export const tutorial: TutorialData = {
       "title": "一个接口，三种 Optimization Modes",
       "badge": "both",
       "badgeLabel": "CORE · MODES",
-      "bridge": "第六章说明了候选池如何保存互补经验。现在改变问题配置：是否提供 <code>dataset</code> 与 <code>valset</code>，会让同一套优化接口分别成为 Single-task Search、Multi-task Search 或 Generalization。",
+      "bridge": "第六章说明了候选池如何保存互补经验。接下来，同一套接口可以处理三种不同目标：直接优化一个任务、在一组相关任务之间共享搜索经验，或学习一个能用于未见样例的全局解。它们分别对应 Single-task Search、Multi-task Search 与 Generalization。",
       "analogy": {
         "title": "三种模式的区别在输入、共享机制与输出",
         "text": "Single-task 优化一个任务；Multi-task 在相关任务间共享搜索中的 Pareto Frontier，并分别输出专用解；Generalization 学习一个用于未见样例的全局 Artifact。",
@@ -254,18 +254,18 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "8.1",
           "title": "完整闭环：候选如何改进，又如何进入下一轮",
-          "desc": "从 Pareto Frontier 选择候选，交给 Evaluator 真实运行；Score 用于比较，Side Information 解释问题；LLM 据此形成 Reflection 并执行 Mutation。新候选 x′ 必须重新评价，再按逐任务或逐指标表现更新 Pareto Frontier，随后进入下一轮。",
+          "desc": "从 Pareto Frontier 选择候选，交给 Evaluator 真实运行；Score 用于比较，Side Information 解释问题；LLM 据此形成 Reflection 并执行 Mutation。默认后端先在 minibatch 上评价新候选 x′；只有表现改善，才触发完整评价并更新 Pareto Frontier。",
           componentId: "optimize-anything-lab"
         },
         {
           kind: "module",
           "id": "8.2",
           "title": "四个关键设计，各自解决什么问题？",
-          "desc": "统一接口让不同任务能够进入同一框架；Side Information 让改写有方向；Pareto-based Search 保留互补候选；Optimization Mode 决定搜索面对的是一个任务、多个相关任务，还是一个需要泛化的全局候选。",
+          "desc": "四个设计分别回答：问题如何进入、下一步怎样改、哪些候选值得保留，以及最终为谁优化。",
           componentId: "optimize-anything-lab"
         }
       ],
-      "insight": "这篇论文的核心不是某一种 mutation 技巧，而是把统一表示、可诊断反馈、多样性搜索与不同任务模式接成同一个可复用优化框架。",
+      "insight": "这篇论文的核心不是某一种 mutation 技巧，而是把统一表示、可诊断反馈、多样性搜索与三种任务模式接成同一个可复用框架。这里的 “Universal” 指不同文本候选可以复用同一套 API 与搜索闭环；领域差异仍由各自的 Evaluator 与 Side Information 定义。",
       "takeaways": []
     },
     {
@@ -285,25 +285,25 @@ export const tutorial: TutorialData = {
           kind: "module",
           "id": "9.1",
           "title": "跨领域主结果：一个接口覆盖了什么？",
-          "desc": "六类主实验覆盖 Skill、调度策略、完整 Agent、Prompt、CUDA Kernel 与数值算法；论文还用图像生成和数值黑箱优化补充展示接口范围。各任务指标不同，因此每张卡只比较该任务自己的基线与优化结果。",
+          "desc": "六类主实验覆盖 Skill、调度策略、完整 Agent、Prompt、CUDA Kernel 与数值算法；正文另有 Image Generation 扩展实验，附录用 Numerical Blackbox 和 3D Modeling 作初步展示。",
           componentId: "optimize-anything-lab"
         },
         {
           kind: "module",
           "id": "9.2",
           "title": "关键机制消融：SI 与 Multi-task 真的有效吗？",
-          "desc": "Side Information 的受控消融覆盖 Prompt、Circle Packing 与 KernelBench；Multi-task scaling 则比较相关 CUDA 任务在相同单题预算下的表现。这里集中展示差值，同时标明哪些阈值改善、哪些没有改善。",
+          "desc": "Side Information 的受控消融覆盖 Prompt、Circle Packing 与 KernelBench；Multi-task scaling 比较相关 CUDA 任务在相同单题预算下的表现。",
           componentId: "optimize-anything-lab"
         },
         {
           kind: "module",
           "id": "9.3",
-          "title": "成本与反例：这些结果不能被怎样外推？",
-          "desc": "实验也给出了 Universal 的现实边界：不相关任务会产生负迁移，更强 proposer 通常得到更好结果但成本更高，不同 evaluator 的执行成本差异很大。最后还要区分两种证据口径：Figure 8 使用 MT 表现最好的 10 个任务，Table 7 则报告 20 个随机任务。",
+          "title": "适用范围与局限",
+          "desc": "Multi-task 只在相关任务间表现出迁移收益；搜索成本取决于 proposer 与 evaluator；Figure 8 只反映筛选出的 10 个任务。",
           componentId: "optimize-anything-lab"
         }
       ],
-      "insight": "综合来看，实验支持“统一接口能够跨多类文本化问题取得有竞争力的结果”，也支持 SI 与相关任务间 Multi-task transfer 的作用；但它不支持无条件迁移、固定成本或全局最优保证。",
+      "insight": "综合来看，实验支持“统一接口能够跨多类文本化问题取得有竞争力的结果”，也支持 SI 与相关任务间 Multi-task transfer 的作用；但方法仍受 proposer 能力、Evaluator 成本、文本表示、任务相关性与 SI 设计质量限制。",
       "takeaways": []
     }
   ],

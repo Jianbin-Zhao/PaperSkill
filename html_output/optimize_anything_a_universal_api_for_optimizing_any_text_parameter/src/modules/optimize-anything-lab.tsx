@@ -340,24 +340,26 @@ const synthesisLoopStages = [
   { id: 'evaluate', index: '02', eyebrow: '真实运行', title: 'Evaluator', term: 'f(x,e)', text: '执行候选，得到可比较的实际表现。' },
   { id: 'feedback', index: '03', eyebrow: '评价结果', title: 'Score + SI', term: '分数 + 诊断', text: 'Score 告诉系统好不好，SI 解释问题在哪里。' },
   { id: 'propose', index: '04', eyebrow: 'LLM proposer', title: 'Reflection + Mutation', term: '理解 → 改写', text: '根据诊断形成判断，并提出有针对性的候选 x′。' },
-  { id: 'verify', index: '05', eyebrow: '不能直接接受', title: '重新评价 x′', term: 'f(x′,e)', text: '新候选必须再次运行 Evaluator，确认改动是否有效。' },
-  { id: 'pareto', index: '06', eyebrow: '更新搜索记忆', title: 'Pareto-based Update', term: '逐任务 / 逐指标', text: '删除被全面超过的候选，保留仍有局部优势的解。' },
+  { id: 'verify', index: '05', eyebrow: 'Minibatch gate', title: '重新评价 x′', term: 'x′ on M', text: '先在抽取的小批任务或样例上测试；表现改善后才触发完整评价。' },
+  { id: 'pareto', index: '06', eyebrow: '完整评价后更新', title: 'Pareto-based Update', term: '逐任务 / 逐指标', text: '把通过完整评价的新候选加入候选池，并保留未被全面超过的解。' },
 ];
 
 function FullOptimizationLoop() {
   return (
     <div className="oa-lab oa-full-loop">
-      <div className="oa-loop-entry">
-        <section><small>任务如何进入</small><b>Text Artifact x</b><span>可修改的文本候选</span></section>
-        <i>＋</i>
-        <section><small>领域目标如何进入</small><b>Evaluator f(x,e)</b><span>Score + Side Information</span></section>
-        <em>共同定义优化问题</em>
-      </div>
       <div className="oa-loop-orbit" aria-label="optimize_anything 完整优化闭环">
         <div className="oa-loop-center">
           <small>SEARCH MEMORY</small>
           <b>Pareto Frontier</b>
           <span>保存互补候选<br />避免过早收敛</span>
+        </div>
+        <div className="oa-loop-arrows" aria-hidden="true">
+          <span className="a1">↘</span>
+          <span className="a2">↓</span>
+          <span className="a3">↙</span>
+          <span className="a4">↖</span>
+          <span className="a5">↑</span>
+          <span className="a6">↗</span>
         </div>
         {synthesisLoopStages.map((stage) => (
           <section className={'oa-loop-node ' + stage.id} key={stage.id}>
@@ -367,16 +369,6 @@ function FullOptimizationLoop() {
             <p>{stage.text}</p>
           </section>
         ))}
-      </div>
-      <div className="oa-loop-reading">
-        <section><b>SI 决定“往哪里改”</b><span>把失败原因交给 Reflection，减少没有依据的试错。</span></section>
-        <section><b>Pareto 决定“哪些候选继续改”</b><span>保留不同任务或指标上的局部强项，再作为下一轮父本。</span></section>
-      </div>
-      <div className="oa-mode-outcomes">
-        <header><small>Optimization Mode</small><b>同一闭环，不同搜索语义与输出</b></header>
-        <section><small>Single-task</small><b>一个任务 → 一个专用解</b></section>
-        <section><small>Multi-task</small><b>共享 Frontier → N 个专用解</b></section>
-        <section><small>Generalization</small><b>train / val → 一个全局解</b></section>
       </div>
     </div>
   );
@@ -494,9 +486,9 @@ function UnifiedProblem() {
   const [expanded, setExpanded] = useState(false);
   const symbols = [
     ['x', '当前正在优化的文本候选解'],
-    ['e', '任务、样本或运行环境；某些场景可以省略'],
-    ['s', '用于比较候选优劣的标量分数'],
-    ['ι', '评估过程中产生的诊断信息'],
+    ['e', '可选的任务或样例；没有时记为 ⊥'],
+    ['s', '用于比较候选优劣的标量分数，越高越好'],
+    ['ι', '可行动的 Side Information：文本、结构化数据或图像诊断'],
   ];
   return (
     <div className="oa-lab oa-unified-problem">
@@ -505,7 +497,7 @@ function UnifiedProblem() {
         <span>→</span>
         <div className="evaluator"><small>领域评价</small><b>Evaluator f(x,e)</b></div>
         <span>→</span>
-        <div><small>统一输出</small><b>Score s + 诊断信息 ι</b></div>
+        <div><small>统一输出</small><b>Score s + 可选诊断信息 ι</b></div>
       </div>
       <p className="oa-unified-sentence">不同领域的问题由此被压缩成同一种形式：评价一个可修改的文本候选解，并继续寻找得分更高的候选。</p>
       <button className="oa-formula-toggle" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}>{expanded ? '收起形式化定义' : '查看论文的形式化定义'}</button>
@@ -515,7 +507,7 @@ function UnifiedProblem() {
           <div>{symbols.map(([symbol, desc]) => <span key={symbol}><b>{symbol}</b>{desc}</span>)}</div>
         </div>
       ) : null}
-      <div className="oa-side-note"><b>Side Information（辅助信息）</b><span>就是这里的诊断信息 ι；此处只需知道，它为后续修改候选提供依据。</span></div>
+      <div className="oa-side-note"><b>Side Information（辅助信息）</b><span>就是这里的可选诊断信息 ι；提供时，它为后续修改候选提供依据。</span></div>
     </div>
   );
 }
@@ -551,9 +543,9 @@ function ApiCallBuilder() {
   const [exampleIdx, setExampleIdx] = useState(0);
   const [startMode, setStartMode] = useState<'seed' | 'objective'>('seed');
   const item = apiExamples[exampleIdx];
-  const startArg = startMode === 'seed'
-    ? `seed_candidate="${item.seed}"`
-    : `objective="${item.objective}"`;
+  const callSnippet = startMode === 'seed'
+    ? `from pathlib import Path\n\nseed_text = Path("${item.seed}").read_text(encoding="utf-8")\n\nresult = oa.optimize_anything(\n  seed_candidate=seed_text,\n  evaluator=${item.evaluator},\n)`
+    : `result = oa.optimize_anything(\n  objective="${item.objective}",\n  evaluator=${item.evaluator},\n)`;
   return (
     <div className="oa-lab oa-api-call">
       <div className="oa-api-toolbar">
@@ -590,10 +582,10 @@ function ApiCallBuilder() {
         </section>
       </div>
 
-      <pre className="oa-code">{`result = oa.optimize_anything(\n  ${startArg},\n  evaluator=${item.evaluator},\n)`}</pre>
+      <pre className="oa-code">{callSnippet}</pre>
       <div className="feedback good">
         {startMode === 'seed'
-          ? `候选内容变成“${item.artifact}”，但最小调用仍然只是 seed_candidate + evaluator。`
+          ? `候选内容变成“${item.artifact}”，接口传入 seed_candidate 与 evaluator 即可开始优化。`
           : 'Seedless mode：objective 取代 seed_candidate，由 LLM 从自然语言目标生成第一个候选。'}
       </div>
     </div>
@@ -608,25 +600,19 @@ const optionalApiFields = [
 ];
 
 function ApiResponsibility() {
-  const [showFull, setShowFull] = useState(false);
   const frameworkDuties = ['Prompt construction', 'Reflection', 'Candidate selection', 'Search strategy'];
   return (
     <div className="oa-lab oa-api-responsibility">
-      <div className="oa-signature-toggle" role="tablist" aria-label="切换 API 信息范围">
-        <button className={!showFull ? 'selected' : ''} onClick={() => setShowFull(false)} role="tab" aria-selected={!showFull}>最小调用</button>
-        <button className={showFull ? 'selected' : ''} onClick={() => setShowFull(true)} role="tab" aria-selected={showFull}>完整签名</button>
-      </div>
-
       <div className="oa-interface-map">
         <section className="oa-what-zone">
           <div className="oa-zone-heading">
             <small>USER · WHAT</small>
             <h5>用户把问题交给接口</h5>
           </div>
-          <div className={`oa-input-rail ${showFull ? 'full' : ''}`}>
+          <div className="oa-input-rail full">
             <span><code>seed_candidate / objective</code><b>候选起点或自然语言目标</b></span>
-            <span><code>evaluator</code><b>Score + Side Information</b></span>
-            {showFull ? optionalApiFields.map(([field, note]) => <span key={field} className="optional"><code>{field}</code><b>{note}</b></span>) : null}
+            <span><code>evaluator</code><b>Score + 可选 Side Information</b></span>
+            {optionalApiFields.map(([field, note]) => <span key={field} className="optional"><code>{field}（可选）</code><b>{note}</b></span>)}
           </div>
         </section>
 
@@ -649,7 +635,7 @@ function ApiResponsibility() {
       </div>
 
       <div className="oa-contract-note">
-        <b>{showFull ? '可选参数补充上下文，不把搜索流程推回给用户。' : '最小调用只回答两个问题：从哪里开始，以及怎样评价。'}</b>
+        <b>可选参数补充上下文，不把搜索流程推回给用户。</b>
         <span>用户无需再编写 mutation prompt 或配置搜索拓扑；这些属于优化后端。</span>
       </div>
     </div>
@@ -1011,17 +997,35 @@ function ParetoFrontier() {
         ) : (
           <>
             <div><small>保留下来</small><b>Frontier</b></div>
-            <span>{frontier.join('、')} · 三种互补候选</span>
+            <span>{frontier.join('、')} · 三种互补候选，会继续作为不同父本参与搜索。</span>
             <em>D、E 被删除</em>
           </>
         )}
       </div>
-      <div className="feedback good">
-        {mode === 'inspect'
-          ? (dominators.length > 0 ? `Candidate ${current.id} 被支配，因此可以从候选池中删除。` : `Candidate ${current.id} 未被支配，即使它不是平均分冠军，也仍有继续探索的价值。`)
-          : 'A、B、C 会继续作为不同父本参与搜索。论文默认 GEPA 后端按候选覆盖 Pareto 目标的频次加权采样，让互补策略都有机会进入下一轮 Reflection。'}
+      <div className="oa-pareto-next" aria-label="Pareto 候选进入下一轮搜索的过程">
+        <section>
+          <small>01 · CANDIDATE SELECTION</small>
+          <b>按 Frontier frequency 加权采样</b>
+          <span>候选覆盖的 Pareto 目标越多，被选为 Mutation 父本的概率越高。</span>
+        </section>
+        <i aria-hidden="true">→</i>
+        <section>
+          <small>02 · MINIBATCH REFLECTION</small>
+          <b>聚焦 2–3 个任务或样例</b>
+          <span>运行候选并收集 Score + SI，让 Proposer 针对这批反馈生成 x′。</span>
+        </section>
+        <i aria-hidden="true">→</i>
+        <section>
+          <small>03 · GATE &amp; UPDATE</small>
+          <b>小批改善才完整评估</b>
+          <span>x′ 在 minibatch 上改善后，才在完整数据上评价并加入候选池。</span>
+        </section>
       </div>
-      <div className="oa-protocol-note">图中数值仅用于解释机制。论文实际使用 per-task、per-example 或 SI 中的 per-metric 分数形成多维目标。</div>
+      {mode === 'inspect' ? (
+        <div className="feedback good">
+          {dominators.length > 0 ? `Candidate ${current.id} 被支配，因此可以从候选池中删除。` : `Candidate ${current.id} 未被支配，即使它不是平均分冠军，也仍有继续探索的价值。`}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -1061,7 +1065,7 @@ const modes = {
     datasetHint: '训练样例提供反馈',
     valset: 'held-out examples',
     valsetHint: '验证未见样例表现',
-    search: '训练反馈 + 验证选择',
+    search: '训练反馈 + held-out 验证',
     searchHint: '学习跨样例复用的 Artifact',
     output: '1 个 globally generalized Artifact',
     example: 'ARC-AGI · AIME',
@@ -1071,7 +1075,7 @@ const modes = {
 type ModeKey = keyof typeof modes;
 
 function ModeInputVisual({ mode }: { mode: ModeKey }) {
-  if (mode === 'single') return <div className="oa-mode-input-viz single"><span>e</span><small>一个任务实例</small></div>;
+  if (mode === 'single') return <div className="oa-mode-input-viz single"><span>x</span><small>无 dataset；候选本身就是解</small></div>;
   if (mode === 'multi') return <div className="oa-mode-input-viz multi"><div><span>e₁</span><span>e₂</span><span>e₃</span></div><small>相关任务 dataset</small></div>;
   return <div className="oa-mode-input-viz gen"><div className="train"><span>t₁</span><span>t₂</span><span>t₃</span></div><b>＋</b><div className="val"><span>v</span></div><small>train / held-out val</small></div>;
 }
@@ -1092,8 +1096,11 @@ function ThreeModes() {
   const d = modes[mode];
   return (
     <div className="oa-lab oa-three-modes">
-      <div className="oa-mode-selector">
-        {(Object.keys(modes) as ModeKey[]).map((key, idx) => <button key={key} className={key === mode ? 'selected' : ''} onClick={() => setMode(key)} aria-pressed={key === mode}><span>0{idx + 1}</span><b>{modes[key].short}</b><small>{modes[key].summary}</small></button>)}
+      <div className="oa-mode-control">
+        <div className="oa-mode-control-head"><b>选择优化模式</b><span>点击下方按钮切换，观察输入、搜索与输出如何变化</span></div>
+        <div className="oa-mode-selector">
+          {(Object.keys(modes) as ModeKey[]).map((key, idx) => <button type="button" key={key} className={key === mode ? 'selected' : ''} onClick={() => setMode(key)} aria-pressed={key === mode}><span>0{idx + 1}</span><b>{modes[key].short}</b><small>{modes[key].summary}</small></button>)}
+        </div>
       </div>
       <div className="oa-common-api"><small>所有模式共享</small><code>seed / objective</code><b>＋</b><code>evaluator</code><em>统一 API</em></div>
       <div className="oa-mode-config" key={'config-' + mode}>
@@ -1181,7 +1188,7 @@ const experimentResults = [
     domain: 'Coding Agent Skills',
     metric: '98.3% / 100%',
     label: 'Haiku / Sonnet 任务通过率',
-    comparison: '79.3 → 98.3 · 94.8 → 100 · 解决时间 -47%',
+    comparison: 'Haiku：79.3% → 98.3% · Sonnet：94.8% → 100% · 任务解决时间减少 47%',
     meaning: '优化出的 Skill 能迁移到另一模型，支持“文本工作流也能作为可泛化候选”。',
   },
   {
@@ -1189,7 +1196,7 @@ const experimentResults = [
     domain: 'Cloud Scheduling',
     metric: '40.2%',
     label: 'CloudCast 相对 Dijkstra 节省成本',
-    comparison: 'Can’t Be Late 节省 7.8% · ADRS 96.6 vs 92.9 OpenEvolve',
+    comparison: 'Can’t Be Late：节省 7.8% · ADRS 综合分：本文 96.6 > OpenEvolve 92.9',
     meaning: '统一接口不仅能改 Prompt，也能发现有竞争力的调度与路由算法。',
   },
   {
@@ -1197,7 +1204,7 @@ const experimentResults = [
     domain: 'ARC-AGI Agent',
     metric: '32.5 → 89.5%',
     label: 'Gemini 3 Flash 测试准确率',
-    comparison: '+57 percentage points · validation 93.5%',
+    comparison: '验证集 93.5% · 未见测试集 89.5%（较初始 +57 个百分点）',
     meaning: '完整 Agent 的代码、架构与控制流可以被联合优化，而不只是调一个 Prompt。',
   },
   {
@@ -1205,15 +1212,15 @@ const experimentResults = [
     domain: 'AIME Prompt',
     metric: '46.67 → 60.00%',
     label: 'GPT-4.1-mini · AIME 2025',
-    comparison: 'MIPROv2 51.33% · 仅修改 system prompt',
-    meaning: '换成统一 API 后，Prompt 优化仍能达到并超过专用基线。',
+    comparison: '本文 60.00% > 专用优化器 MIPROv2 51.33% · 仅修改 system prompt',
+    meaning: '在 Prompt 优化这一原生场景中，统一 API 没有牺牲性能，并超过专用基线 MIPROv2。',
   },
   {
     scope: '主实验 · Multi-task',
     domain: 'CUDA Kernels',
     metric: '87%',
     label: '31 个 Kernel 匹配或超过 PyTorch',
-    comparison: '48% ≥ 1.1× · 25% ≥ 1.2× · V100 32GB',
+    comparison: '相对 PyTorch：48% 的 Kernel ≥ 1.1× · 25% ≥ 1.2× · V100 32GB',
     meaning: '共享搜索能够在多种算子上生成正确且具有加速效果的专用 Kernel。',
   },
   {
@@ -1221,39 +1228,41 @@ const experimentResults = [
     domain: 'Circle Packing',
     metric: '2.63598',
     label: 'n=26 · sum of radii',
-    comparison: '63 evaluations · OpenEvolve 2.6307 @ 200',
+    comparison: '本文：2.63598 / 63 次评价 > OpenEvolve：2.6307 / 200 次评价（同为 GPT-5.1 proposer）',
     meaning: '在匹配 proposer 的对照中，用更少评价次数超过代码演化基线。',
   },
   {
-    scope: '补充实验 · Multi-task',
+    scope: '正文扩展实验 · Multi-task',
     domain: 'Image Generation',
     metric: '2.2×',
     label: 'Pelican SVG · VLM score',
-    comparison: '0.330 → 0.726 · 5/5 人类评估者在所有目标上偏好优化结果',
+    comparison: 'zero-shot 0.330 → 本文 0.726（2.2×）· 5/5 人类评估者在所有目标上偏好优化结果',
     meaning: '图像可以通过 SVG / CAD 文本代理与视觉 SI 进入同一优化框架。',
   },
   {
-    scope: '补充实验 · Single-task',
+    scope: '附录初步展示 · Single-task',
     domain: 'Numerical Blackbox',
     metric: '7 / 10',
-    label: '与 Optuna 比较的获胜任务数',
-    comparison: '通过生成自定义 solver code 完成优化',
-    meaning: '框架能够搜索求解器程序，而不仅是直接搜索一组数值参数。',
+    label: '选定任务中，optimize_anything 胜过 Optuna',
+    comparison: '对比 Optuna：选定 10 题 @ 2,000 次/题，本文 7 胜 · 完整 56 题 @ 8,000 次/题，40 平 / 7 胜 / 9 负',
+    meaning: '在 Optuna 低预算表现困难的选定任务上，定制 solver code 展现出优势；完整基准中则以持平为主。',
+  },
+  {
+    scope: '附录初步展示 · Seedless',
+    domain: '3D Modeling',
+    metric: '从零生成',
+    label: '可识别的 3D Unicorn',
+    comparison: 'zero-shot 初始结果 → 迭代后的可识别 3D Unicorn · 仅提供自然语言 objective，无 seed code',
+    meaning: '展示 Seedless mode 可以从自然语言目标自举候选，并通过视觉 SI 持续改进。',
   },
 ];
 
 function ExperimentResultsOverview() {
   return (
     <div className="oa-lab oa-experiment-overview">
-      <div className="oa-results-summary">
-        <div><small>PRIMARY</small><b>6 类主实验</b><span>覆盖 Single · Multi · Generalization</span></div>
-        <i>＋</i>
-        <div><small>ADDITIONAL</small><b>2 类补充结果</b><span>数值黑箱 · 图像 / 3D</span></div>
-        <em>指标不横向混算，只与各自基线比较</em>
-      </div>
       <div className="oa-experiment-grid">
         {experimentResults.map((result, index) => (
-          <section className={result.scope.startsWith('补充') ? 'additional' : ''} key={result.domain}>
+          <section className={result.scope.startsWith('主实验') ? '' : 'additional'} key={result.domain}>
             <header><span>{String(index + 1).padStart(2, '0')}</span><div><small>{result.scope}</small><b>{result.domain}</b></div></header>
             <div className="oa-result-number"><strong>{result.metric}</strong><small>{result.label}</small></div>
             <code>{result.comparison}</code>
@@ -1290,13 +1299,21 @@ function MechanismEvidenceOverview() {
         <p><b>数据说明：</b>SI 不只提高最终分数，也显著减少达到同一验证水平所需的评价次数；这种收益同时出现在 Prompt、数值算法和 CUDA 代码中。</p>
       </section>
       <section className="oa-evidence-panel mt">
-        <header><div><small>TABLE 6–7</small><b>相关 CUDA 任务的 Multi-task scaling</b></div><em>相同单题预算</em></header>
+        <header><div><small>TABLE 6 · 结果均统计原 10 题</small><b>加入更多相关任务是否有帮助？</b></div><em>3 种设置</em></header>
         <div className="oa-evidence-table oa-mt-table">
           <div className="head"><span>速度阈值</span><span>ST</span><span>MT10</span><span>MT20</span></div>
           {multiTaskScaling.map((row) => <div key={row.threshold}><b>{row.threshold}</b><span>{row.st}</span><strong>{row.mt10}</strong><em>{row.mt20}</em></div>)}
         </div>
-        <div className="oa-random-check"><small>20 个随机任务复核</small><b>f₁.₀：50% → 90% · f₁.₁：25% → 40% · f₁.₂：15% = 15%</b></div>
-        <p><b>数据说明：</b>相关任务间共享经验主要改善中等速度阈值，但并非每个阈值都随任务数增加而提升，因此不能概括成“任务越多一定越好”。</p>
+        <div className="oa-scaling-key">
+          <span><b>ST</b><small>10 题各自优化</small></span>
+          <span><b>MT10</b><small>这 10 题联合</small></span>
+          <span><b>MT20</b><small>再加入 10 题联合</small></span>
+        </div>
+        <div className="oa-random-check">
+          <small>TABLE 7 · 另一组随机抽取的 20 题</small>
+          <b>同一批 20 题：ST 各自优化 → MT20 联合优化 · f₁.₀ 50% → 90% · f₁.₁ 25% → 40% · f₁.₂ 15% = 15%</b>
+        </div>
+        <p><b>数据说明：</b>在随机抽取的 20 个任务上，Multi-task 将达到 PyTorch 基线的比例从 50% 提高到 90%，将至少加速 10% 的比例从 25% 提高到 40%；但至少加速 20% 的比例仍为 15%。这说明共享搜索扩大了有效优化的覆盖面，但不会在所有速度阈值上都带来提升。</p>
       </section>
     </div>
   );
@@ -1304,45 +1321,48 @@ function MechanismEvidenceOverview() {
 
 const boundaryEvidence = [
   {
-    title: '不相关任务会负迁移',
+    title: 'Multi-task 依赖任务相关性',
     metric: '2.6360 > 2.6313 > 2.5973',
-    detail: 'Circle Packing：Single-task > MT7 > MT11',
-    meaning: 'Multi-task 需要共享结构；不同 N 的装箱问题联合搜索反而引入噪声。',
+    detail: 'Circle Packing · Single-task > MT7 > MT11',
+    meaning: '联合搜索并不天然更强。不相关任务会相互干扰，Multi-task 的迁移收益只在任务之间存在可复用结构时成立。',
   },
   {
     title: 'Proposer 存在质量 / 成本权衡',
-    metric: '2.636 / $6 vs 2.512 / $0.50',
-    detail: 'Circle Packing：GPT-5.1 vs GPT-5-nano',
-    meaning: '便宜模型仍能改进 seed，但最终质量较低；统一接口不会消除 proposer 能力差异。',
+    metric: '2.512 / $0.50  vs  2.636 / $6',
+    detail: 'Circle Packing · GPT-5-nano vs GPT-5.1',
+    meaning: '便宜模型仍能改进候选，但最终结果较低；更强的 proposer 得到更好结果，同时成本也更高。实际总成本还会受到 Evaluator 运行开销影响。',
   },
   {
-    title: 'Evaluator 主导总体成本',
-    metric: '$1 → $144.70',
-    detail: 'Numerical Blackbox → ARC-AGI',
-    meaning: '论文实验总成本跨度很大；长轨迹 Agent、编译与仿真会决定实际可用性。',
+    title: '不同任务的实验总成本相差很大',
+    metric: '约 $1  ｜  $144.70',
+    detail: 'Numerical Blackbox  ｜  ARC-AGI',
+    meaning: '论文各实验的总成本并不相同：统一 API 统一的是优化接口，而不是为所有任务提供固定的搜索预算。',
   },
   {
-    title: '这不是全部 KernelBench 的平均结果',
-    metric: '只比较 MT 最强的 10 题',
-    detail: '原图口径 · Figure 8：先按 MT 表现筛选，再以相同单题预算重跑 ST',
-    meaning: '因此它只能说明 MT 在这 10 个强项任务上收敛更快、达到速度阈值的任务更多。若要判断更一般的效果，应再看 Table 7 的 20 个随机任务：f₁.₀ 为 50%→90%，f₁.₁ 为 25%→40%，f₁.₂ 则保持 15%。',
+    title: 'Figure 8 只证明所选任务上的优势',
+    metric: 'MT 表现最好的 10 题',
+    detail: '先筛选 MT 强项任务，再以相同单题预算重跑 ST',
+    meaning: '曲线说明 MT 在这 10 题上收敛更快，但不能代表全部 KernelBench 的平均效果；更一般的判断应结合 Table 7 的 20 个随机任务。',
   },
 ];
 
 function ExperimentalBoundaries() {
   return (
     <div className="oa-lab oa-boundary-overview">
-      <div className="oa-boundary-grid">
+      <div className="oa-boundary-list">
         {boundaryEvidence.map((item, index) => (
           <section key={item.title}>
-            <header><span>{String(index + 1).padStart(2, '0')}</span><b>{item.title}</b></header>
-            <strong>{item.metric}</strong>
-            <small>{item.detail}</small>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <div><b>{item.title}</b><strong>{item.metric}</strong><small>{item.detail}</small></div>
             <p>{item.meaning}</p>
           </section>
         ))}
       </div>
-      <div className="oa-evidence-verdict"><small>实验最终支持的范围</small><b>跨领域有效 + SI 有贡献 + 相关任务可迁移</b><i>≠</i><b>任意任务、任意成本、必然提升</b></div>
+      <div className="oa-boundary-verdict">
+        <b><small>文本表示限制</small>候选必须能够表示成文本</b>
+        <i>＋</i>
+        <b><small>SI 设计边界</small>有效诊断仍然需要领域知识</b>
+      </div>
     </div>
   );
 }
