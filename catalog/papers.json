@@ -59,6 +59,24 @@
     "tutorialUrl": "papers/bwm_a_low_cost_high_fidelity_world_simulator_for_robot_learning/"
   },
   {
+    "paperName": "compressing_the_validation_bottleneck_an_agentic_self_driving_lab_for_scientific_discovery",
+    "title": "Compressing the Validation Bottleneck: An Agentic Self-Driving Lab for Scientific Discovery",
+    "authors": [],
+    "year": null,
+    "venue": "",
+    "paperUrl": "https://arxiv.org/abs/2607.04508",
+    "participants": [
+      {
+        "name": "ZhuXiongxiong",
+        "github": "rainy-season-not-dividing"
+      }
+    ],
+    "topics": [],
+    "skillVersion": "1.3.0",
+    "status": "review",
+    "tutorialUrl": "papers/compressing_the_validation_bottleneck_an_agentic_self_driving_lab_for_scientific_discovery/"
+  },
+  {
     "paperName": "discrete_meanflow_training_curriculum",
     "title": "Discrete Meanflow Training Curriculum",
     "authors": [],
