@@ -189,7 +189,7 @@ export const tutorial: TutorialData = {
           title: "双 Transformer 分支的参数与信息交换",
           desc: "自回归分支与扩散分支各自拥有独立的归一化层、注意力投影和前馈网络参数；两者由同一个预训练视觉语言模型初始化，但训练后不共享这些参数。",
           componentId: "ch8-mot-architecture",
-          figure: "/images/figure-5.png"
+          figure: "./images/figure-5.png"
         }
       ],
       insight: "Cosmos 3 以<b>分支独立参数</b>保持推理与生成的专门化，并以<b>非对称联合注意力</b>将推理条件传给生成分支。",
