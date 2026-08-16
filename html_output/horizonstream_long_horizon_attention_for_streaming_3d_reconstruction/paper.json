@@ -3,8 +3,8 @@
   "paperName": "horizonstream_long_horizon_attention_for_streaming_3d_reconstruction",
   "title": "HorizonStream: Long-Horizon Attention for Streaming 3D Reconstruction",
   "authors": [],
-  "year": null,
-  "venue": "",
+  "year": 2026,
+  "venue": "arXiv",
   "paperUrl": "https://arxiv.org/abs/2605.23889",
   "participants": [
     {
@@ -12,7 +12,10 @@
       "github": "Jianbin-Zhao"
     }
   ],
-  "topics": [],
+  "topics": [
+    "Streaming 3D Reconstruction",
+    "Long-Horizon Attention"
+  ],
   "skillVersion": "1.3.0",
   "status": "review",
   "entry": "index.html"
