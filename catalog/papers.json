@@ -276,6 +276,36 @@
     "tutorialUrl": "papers/unlimited_ocr_works/"
   },
   {
+    "paperName": "videoagent_all_in_one_framework_for_video_understanding_and_editing",
+    "title": "VideoAgent: All-in-One Framework for Video Understanding and Editing",
+    "authors": [
+      "Hengji Zhou",
+      "Lingxuan Huang",
+      "Jian Wang",
+      "Bing Zhou",
+      "Si Wu",
+      "Lianghao Xia",
+      "Chao Huang"
+    ],
+    "year": 2026,
+    "venue": "arXiv",
+    "paperUrl": "https://arxiv.org/abs/2606.23327",
+    "participants": [
+      {
+        "name": "李雪彤",
+        "github": "snowietongl-boop"
+      }
+    ],
+    "topics": [
+      "Video Understanding",
+      "Video Editing",
+      "Multi-Agent Systems"
+    ],
+    "skillVersion": "1.0.0",
+    "status": "review",
+    "tutorialUrl": "papers/videoagent_all_in_one_framework_for_video_understanding_and_editing/"
+  },
+  {
     "paperName": "what_makes_prompts_a_graph_necessary_and_sufficient_conditions_for_prompt_graph_engineering",
     "title": "What makes prompts a graph: necessary and sufficient conditions for prompt graph engineering",
     "authors": [
