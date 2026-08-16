@@ -16,5 +16,27 @@
     "skillVersion": "1.0.0",
     "status": "published",
     "tutorialUrl": "papers/elf_embedded_language_flows/"
+  },
+  {
+    "paperName": "improved_large_language_diffusion_models",
+    "title": "Improved Large Language Diffusion Models",
+    "authors": [],
+    "year": 2026,
+    "venue": "",
+    "paperUrl": "https://arxiv.org/abs/2606.25331",
+    "participants": [
+      {
+        "name": "李赛",
+        "github": "stopoverthinkyou-beep"
+      }
+    ],
+    "topics": [
+      "Diffusion LLM",
+      "Large Language Model",
+      "Masked Diffusion"
+    ],
+    "skillVersion": "1.0.0",
+    "status": "published",
+    "tutorialUrl": "papers/improved_large_language_diffusion_models/"
   }
 ]
