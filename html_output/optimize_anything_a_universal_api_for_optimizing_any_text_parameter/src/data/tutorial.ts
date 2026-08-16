@@ -3,551 +3,315 @@ import type { TutorialData } from '../types';
 export const tutorial: TutorialData = {
   "meta": {
     "titleEn": "optimize_anything: A Universal API for Optimizing any Text Parameter",
-    "titleZh": "optimize_anything：优化任意文本参数的通用 API",
-    "venue": "CAIS 2026 · 16 页 · 11 幅图",
-    "authors": "Lakshya A Agrawal、Donghyun Lee、Shangyin Tan 等",
-    "affiliation": "加州大学伯克利分校 · MIT",
-    "domain": "LLM 文本优化 · Agent 系统 · 演化搜索",
-    "coreProblem": "现有工具常被一种制品或一种搜索模式锁住，只有总分时，提议模型还不知道候选为什么失败。",
-    "coreInsight": "把候选统一写成<b>文本制品</b>，让评估器同时返回<b>分数 + 可行动侧信息（SI）</b>，再用 Pareto 搜索保留互补强项：同一 API 因而可以承载单任务、多任务与泛化三种优化模式。",
+    "titleZh": "中文交互式论文教程",
+    "venue": "CAIS 2026 · arXiv:2605.19633",
+    "authors": "Lakshya A Agrawal, Donghyun Lee, Shangyin Tan, Wenjie Ma, Karim Elmaaroufi, Rohit Sandadi, Sanjit A. Seshia, Koushik Sen, Dan Klein, Ion Stoica, Joseph E. Gonzalez, Omar Khattab, Alexandros G. Dimakis, Matei Zaharia",
+    "affiliation": "UC Berkeley · Databricks · UT Austin 等",
+    "domain": "LLM-based Text Optimization",
+    "coreProblem": "Prompt、代码、Agent、调度策略乃至 SVG 都能写成文本，但传统优化器往往绑定对象类型与任务。能否只换 evaluator，就复用同一套搜索循环？",
+    "coreInsight": "论文把候选统一成 <mark class=\"oa-key\">Text Artifact</mark>，把领域目标封装进 Evaluator，再用 Score 与 Side Information 驱动 Reflection、Mutation 和 Pareto 搜索。真正的核心不是“LLM 随便改文本”，而是用一个 <mark class=\"oa-key\">统一</mark> 接口持续、可诊断地 <mark class=\"oa-key warm\">优化</mark> 可评价的文本候选。",
     "keywords": [
-      "文本制品",
-      "侧信息 SI",
-      "Pareto 前沿",
-      "跨任务迁移",
-      "通用优化 API"
+      "统一 Text Optimization",
+      "Side Information",
+      "Pareto Search",
+      "Single · Multi · Generalization"
     ]
   },
   "hero": {
     "oldMethod": {
-      "desc": "专用工具各自配置；只有总分时，下一轮仍在猜<b>哪里需要改</b>。",
-      componentId: "paper-plane-lab"
+      "desc": "<b>对象类型与优化流程绑定</b>：表示方式、反馈接口和搜索工作流都随 Prompt、Program、Agent 的变化而重新适配。",
+      componentId: "optimize-anything-lab"
     },
     "newMethod": {
-      "desc": "统一文本接口把<b>分数与 SI</b>交给提议模型，定向修改并保留互补候选。",
-      componentId: "paper-plane-lab"
+      "desc": "<b>统一表示，替换 evaluator</b>：不同对象先成为 Text Artifact x；领域差异进入 f(x,e)，Reflection、Mutation 与搜索策略得以复用。",
+      componentId: "optimize-anything-lab"
     }
   },
   "chapters": [
     {
       kind: "chapter",
       "id": "chap-1",
-      "title": "从专用工具到一个循环",
+      "title": "从专用优化器到 Universal Optimizer",
       "badge": "inf",
-      "badgeLabel": "基础 · 推理",
-      "bridge": "先别急着记 API。我们从最朴素的问题开始：<b>只有一个总分，下一轮到底该改哪里？</b>",
+      "badgeLabel": "CORE · WHY",
+      "bridge": "AlphaEvolve 能演化程序，GEPA 能根据反馈优化 Prompt。它们共同说明 LLM 已经可以承担优化器的角色；但优化对象一换，问题表示、反馈来源与搜索流程往往也要重新设计。",
       "analogy": {
-        "title": "一次试飞，两个反馈世界",
-        "text": "只知道“得了 62 分”，你只能盲改。若同时看到<b>左偏、机头下沉</b>，下一次折翼就有方向。",
-        componentId: "paper-plane-lab"
+        "title": "能力已经出现，但还没有统一",
+        "text": "AlphaEvolve 面向程序，GEPA 面向 Prompt，Agent、调度策略和 Kernel 也各有自己的优化流程。现有方法证明了 LLM 优化的能力，同时也暴露出对象与优化器之间的专用绑定。",
+        componentId: "optimize-anything-lab"
       },
       "modules": [
         {
           kind: "module",
           "id": "1.1",
-          "title": "同一起点：盲试还是定向修正",
-          "desc": "让两架纸飞机从完全相同的折法出发。左侧评估器只给分数，右侧还给 SI；按下按钮后，观察第二次试飞为什么走向不同。",
-          componentId: "paper-plane-lab"
-        },
-        {
-          kind: "module",
-          "id": "1.2",
-          "title": "六种制品，同一个插口",
-          "desc": "切换论文中的六个主要领域。接口几何保持不变，但候选文本、评估逻辑、SI 与指标会随任务改变。",
-          componentId: "paper-plane-lab"
+          "title": "已有方法很强，但优化器仍然彼此专用",
+          "desc": "AlphaEvolve 与 GEPA 都利用 LLM 持续提出并改进候选，但它们分别围绕程序和 Prompt 组织自己的优化闭环。点击任一方法，可以查看这两条闭环为何不能直接互换。",
+          componentId: "optimize-anything-lab"
         }
       ],
-      "insight": "真正可复用的不是某个领域的专用变异器，而是<b>文本候选 + 评估器 + 可行动反馈</b>这份契约。",
-      "takeaways": [
-        {
-          "icon": "🎯",
-          "title": "共形结构",
-          "desc": "六个领域都能写成候选、评估、诊断与改写。"
-        },
-        {
-          "icon": "🔧",
-          "title": "评价仍需定制",
-          "desc": "通用的是接口，不是领域指标。"
-        },
-        {
-          "icon": "✨",
-          "title": "诊断胜过盲猜",
-          "desc": "SI 让下一次修改有方向，但不保证每轮单调上升。"
-        }
-      ]
+      "takeaways": []
     },
     {
       kind: "chapter",
       "id": "chap-2",
-      "title": "文本制品与评估器契约",
+      "title": "统一抽象：把不同问题变成文本优化",
       "badge": "inf",
-      "badgeLabel": "基础 · 推理",
-      "bridge": "上一节说“任何文本参数”，但不是任何现实对象都能直接塞进循环。这里要过两道门：<b>可写成文本</b>与<b>可自动评估</b>。",
+      "badgeLabel": "CORE · WHAT",
+      "bridge": "Prompt、CUDA Kernel、Agent 与调度策略的结构和用途都不相同。论文能够用一个框架处理它们，关键不在于抹平领域差异，而在于为这些差异找到共同的优化接口。",
       "analogy": {
-        "title": "先把折法写成设计卡",
-        "text": "纸飞机能被优化，不是因为它是纸，而是因为折法能写成文本，试飞又能自动评分。",
-        componentId: "paper-plane-lab"
+        "title": "不同对象如何进入同一个优化问题？",
+        "text": "共同接口由两部分组成：一个可读取、可修改的 <b>Text Artifact（文本候选解）</b>，以及一个知道怎样评价它的 <b>Evaluator（评估器）</b>。",
+        componentId: "optimize-anything-lab"
       },
       "modules": [
         {
           kind: "module",
           "id": "2.1",
-          "title": "能否接入这条 API",
-          "desc": "选择一个场景，再拖动候选卡依次穿过“文本表示”和“自动评估”两道门。被挡住时，反馈会说明缺的到底是什么。",
-          componentId: "paper-plane-lab"
+          "title": "不同对象，先收束成 Text Artifact（文本候选解）",
+          "desc": "选择论文中的对象，观察它们如何转换成优化器可以读取和修改的文本。Prompt 本身是文本；代码、Agent 架构、调度策略与图形描述也都能以程序或结构化文本保存。这里的 <b>Text Artifact</b> 更自然地理解为“文本候选解”。",
+          componentId: "optimize-anything-lab"
+        },
+        {
+          kind: "module",
+          "id": "2.2",
+          "title": "文本可以修改，但什么叫“更好”？",
+          "desc": "仅仅把候选写成文本还不能产生优化方向。切换 AIME、Circle Packing 与 ARC-AGI，可以看到每个领域都需要自己的 <b>Evaluator（评估器）</b>实际运行候选，并把任务目标转换成可比较的 Score（分数）。",
+          componentId: "optimize-anything-lab"
+        },
+        {
+          kind: "module",
+          "id": "2.3",
+          "title": "把领域问题压缩成同一个函数接口",
+          "desc": "当 Text Artifact 与 Evaluator 配对后，不同任务都呈现为同一种输入输出关系：评估文本候选解，返回分数与诊断信息，再寻找更好的候选。领域知识仍由各自的 Evaluator 负责。",
+          componentId: "optimize-anything-lab"
         }
       ],
-      "formula": {
-        "lead": "评估器一次返回“多好”与“为什么”两类信息。",
-        "unicode": "f(x,e) = ( s(x,e), ι(x,e) )",
-        "symbols": [
-          {
-            "sym": "f",
-            "desc": "评估器：执行候选并返回分数与可选诊断。"
-          },
-          {
-            "sym": "x",
-            "desc": "文本制品字符串；非文本对象需要一个文本代理。"
-          },
-          {
-            "sym": "e",
-            "desc": "可选样例或任务；单任务直接评估时可视为 ⊥。"
-          },
-          {
-            "sym": "s",
-            "desc": "标量分数；该 API 约定越高越好。"
-          },
-          {
-            "sym": "ι",
-            "desc": "可行动侧信息，可为文本、结构化数据、图像或空值。"
-          }
-        ]
-      },
-      "takeaways": [
-        {
-          "icon": "🎯",
-          "title": "两道门槛",
-          "desc": "候选要能文本化，评估器要能执行。"
-        },
-        {
-          "icon": "🔧",
-          "title": "代理有代价",
-          "desc": "连续或二进制对象需要文本代理，并承担代理误差。"
-        },
-        {
-          "icon": "✨",
-          "title": "契约很小",
-          "desc": "f 同时返回标量分数与可选 SI。"
-        }
-      ]
+      "insight": "问题已经被统一成“文本候选解 + Evaluator”；那么，用户究竟需要向 optimize_anything 提供哪些信息？",
+      "takeaways": []
     },
     {
       kind: "chapter",
       "id": "chap-3",
-      "title": "三种搜索模式，不是三个 API",
+      "title": "统一接口：用户只需要定义“优化什么”",
       "badge": "inf",
-      "badgeLabel": "基础 · 推理",
-      "bridge": "候选与评估器已经就位。下一步要明确你究竟想得到：<b>一个解、N 个专门解，还是一个能泛化的解</b>。",
+      "badgeLabel": "CORE · API",
+      "bridge": "第二章把不同问题统一成 <b>Text Artifact + Evaluator</b>。到了 API 层，这两个抽象几乎原样成为参数：把候选起点交给 <code>seed_candidate</code>，把评价方法交给 <code>evaluator</code>。用户描述问题，框架组织搜索。",
       "analogy": {
-        "title": "三条跑道，三种承诺",
-        "text": "单任务要一个解，多任务要多个专门解，泛化则要一个能应对未见风况的解。",
-        componentId: "paper-plane-lab"
+        "title": "用户定义问题，框架执行搜索",
+        "text": "用户声明 seed 或 objective、evaluator 以及可选数据；框架负责候选选择、执行、Reflection、Mutation、minibatch gate 和 Pareto 更新。",
+        componentId: "optimize-anything-lab"
       },
       "modules": [
         {
           kind: "module",
           "id": "3.1",
-          "title": "用数据配置选对模式",
-          "desc": "切换 dataset 与 valset 的配置，观察激活的模式、输出数量和验证语义。多任务与泛化的差别会同时出现在画面和反馈中。",
-          componentId: "paper-plane-lab"
+          "title": "把统一抽象写成一次最小 API 调用",
+          "desc": "切换论文中的任务，观察候选内容和评价逻辑如何变化，而函数形状保持不变。通常从 <code>seed_candidate + evaluator</code> 开始；如果连起始候选都难以编写，可以改用自然语言 <code>objective</code>，让 LLM 从零生成第一个候选。",
+          componentId: "optimize-anything-lab"
+        },
+        {
+          kind: "module",
+          "id": "3.2",
+          "title": "用户声明 what，框架接管 how",
+          "desc": "展开完整签名可以看到 <code>dataset</code>、<code>valset</code>、<code>background</code> 和 <code>config</code> 等可选信息。它们补充任务、验证集、领域知识与运行设置；用户不需要再编写 mutation prompt、候选选择规则或搜索流程。",
+          componentId: "optimize-anything-lab"
         }
       ],
-      "takeaways": [
-        {
-          "icon": "🎯",
-          "title": "单任务",
-          "desc": "一个问题对应一个候选解。"
-        },
-        {
-          "icon": "🔧",
-          "title": "多任务",
-          "desc": "相关任务共享经验，最终输出仍各自专门。"
-        },
-        {
-          "icon": "✨",
-          "title": "泛化",
-          "desc": "一个制品要通过未见样例的验证。"
-        }
-      ]
+      "insight": "接口已经说明用户需要提供什么。接下来打开框架内部：这些信息如何驱动 Candidate 一轮轮变成 Better Candidate？",
+      "takeaways": []
     },
     {
       kind: "chapter",
       "id": "chap-4",
-      "title": "目标函数与平均分陷阱",
-      "badge": "both",
-      "badgeLabel": "推理 + 训练",
-      "bridge": "三种模式都会“最大化分数”，但在哪些任务上取平均完全不同。更麻烦的是，<b>一个平均分会淹没互补强项</b>。",
+      "title": "优化循环：从 Candidate 到 Better Candidate",
+      "badge": "trn",
+      "badgeLabel": "CORE · LOOP",
+      "bridge": "第三章把候选起点与 evaluator 交给了 API。现在只追踪一次改写：Candidate 如何被真实执行，评价结果如何变成 Reflection，以及 Reflection 如何推动 Mutation 生成新的 Candidate。",
       "analogy": {
-        "title": "平均得分会遮住偏科",
-        "text": "只看总平均，可能丢掉“续航最好”或“稳定性最好”的折法。",
-        componentId: "paper-plane-lab"
+        "title": "一次迭代究竟发生了什么？",
+        "text": "Candidate 先经过 evaluator 得到 Score 与 SI；Reflection 将反馈转成修改理由，Mutation 生成新候选；只有 minibatch 改善才触发完整评估。",
+        componentId: "optimize-anything-lab"
       },
       "modules": [
         {
           kind: "module",
           "id": "4.1",
-          "title": "调权重，看平均值怎样改写选择",
-          "desc": "拖动任务 A 的权重。三位候选的原始能力不变，但被平均分选中的候选会改变；画面中的坐标仅作教学几何，不是论文实验值。",
-          componentId: "paper-plane-lab"
+          "title": "从 Candidate x 到 Candidate x′",
+          "desc": "点击流程节点或使用“上一步 / 下一步”，观察一轮候选改写。这个网页版中文图重绘了论文 Figure 1 的核心关系：候选必须先经过 Evaluator，Score 与 Side Information 再交给 LLM proposer 形成 Reflection 与 Mutation。",
+          componentId: "optimize-anything-lab"
         }
       ],
-      "formula": {
-        "lead": "三种模式都最大化分数，但“在哪些任务上取平均”不同。",
-        "unicode": "Jsingle(x)=s(x)；Jmulti(x)=(1/n)Σᵢ s(x,eᵢ)；Jgen(x)=(1/k)Σⱼ s(x,eⱼᵛᵃˡ)",
-        "symbols": [
-          {
-            "sym": "Jsingle",
-            "desc": "单任务目标：候选本身就是该问题的解。"
-          },
-          {
-            "sym": "Jmulti",
-            "desc": "多任务目标：在 n 个相关任务上聚合搜索反馈。"
-          },
-          {
-            "sym": "Jgen",
-            "desc": "泛化目标：用留出验证样例测量一个制品的未见表现。"
-          },
-          {
-            "sym": "n",
-            "desc": "相关任务数，必须为正整数。"
-          },
-          {
-            "sym": "k",
-            "desc": "留出验证样例数，必须为正整数。"
-          }
-        ]
-      },
-      "takeaways": [
-        {
-          "icon": "🎯",
-          "title": "目标不同",
-          "desc": "同一接口并不意味着三个模式在优化同一个量。"
-        },
-        {
-          "icon": "🔧",
-          "title": "平均会丢信息",
-          "desc": "专门强项可能被总分淹没。"
-        },
-        {
-          "icon": "✨",
-          "title": "逐项记录",
-          "desc": "保留逐任务和逐指标得分，才有 Pareto 搜索的空间。"
-        }
-      ]
+      "insight": "Candidate x′ 是一次有依据的改写，但不是已经被证明更优的答案；它必须重新进入 Evaluator。下一章继续追问：Score 之外，什么反馈能真正告诉 LLM 应该改哪里？",
+      "takeaways": []
     },
     {
       kind: "chapter",
       "id": "chap-5",
-      "title": "SI：把“错了”变成“改哪里”",
+      "title": "让搜索变得“有方向”：Side Information",
       "badge": "both",
-      "badgeLabel": "推理 + 训练",
-      "bridge": "现在回到评估器。平均分告诉你“结果怎样”，但真正推动下一次反思的，是<b>哪一种失败正在发生</b>。",
+      "badgeLabel": "CORE · DIAGNOSIS",
+      "bridge": "第四章中，Evaluator 的输出会进入 Reflection。但一个标量 Score 只能告诉 proposer 表现升了还是降了，无法说明失败发生在哪里。Side Information 把评估过程中的诊断线索一起带回优化循环。",
       "analogy": {
-        "title": "看见偏航，才知道折哪边",
-        "text": "总分只说“没到靶心”，SI 则指出左偏、下沉或边界违规。",
-        componentId: "paper-plane-lab"
+        "title": "Score 与 Side Information 分工不同",
+        "text": "Score 告诉系统候选之间谁更好；Side Information 解释错误样例、编译失败、执行瓶颈或局部指标，使 Reflection 能提出针对性修改。",
+        componentId: "optimize-anything-lab"
       },
       "modules": [
         {
           kind: "module",
           "id": "5.1",
-          "title": "相同预算下，SI 改变收敛路线",
-          "desc": "选择一个消融领域并开始对照。两条曲线使用各自论文协议和正确的指标方向，不会把不兼容指标拼成一个总分。",
-          componentId: "paper-plane-lab"
+          "title": "同一低分：盲改，还是按诊断定向改？",
+          "desc": "两条教学支线从同一候选和同一 Score 出发。逐轮执行 Evaluator，观察 Score-only 为什么只能泛化猜测，而 Score + SI 如何根据编译错误、Profiler 与正确性反馈改变下一次 mutation。数值为机制示意，不是论文实验结果。",
+          componentId: "optimize-anything-lab"
+        },
+        {
+          kind: "module",
+          "id": "5.2",
+          "title": "消融证据：SI 到底贡献了什么？",
+          "desc": "切换任务查看由论文 Figure 9 与 Table 4 重绘的网页图表。Facility Support 比较收敛速度与最终测试分数；Circle Packing、KernelBench ST 和 MT 使用各自的实验指标与独立刻度。",
+          componentId: "optimize-anything-lab"
         }
       ],
-      "insight": "SI 的价值不在于“反馈更长”，而在于它能把下一次修改指向具体故障。",
-      "formula": {
-        "lead": "SI 扩展评估器输出，但并不把离散文本搜索变成可微优化。",
-        "unicode": "f(x,e) = ( s(x,e), ι(x,e) )，ι ∈ {文本，结构化数据，图像}",
-        "symbols": [
-          {
-            "sym": "ι",
-            "desc": "侧信息：可为空；有值时应能帮助定位下一步修改。"
-          },
-          {
-            "sym": "s",
-            "desc": "标量分数，只说明候选相对好坏。"
-          }
-        ]
-      },
-      "takeaways": [
-        {
-          "icon": "🎯",
-          "title": "多好与为何",
-          "desc": "s 与 ι 承担不同职责。"
-        },
-        {
-          "icon": "🔧",
-          "title": "先看协议",
-          "desc": "不同领域的 SI 消融指标不能直接相加。"
-        },
-        {
-          "icon": "✨",
-          "title": "可行动才关键",
-          "desc": "错误、轨迹和子分数支持定向修改。"
-        }
-      ]
+      "insight": "高质量 SI 的标准不是“信息多”，而是能让 Reflection 明确指出失败机制，并生成可验证的下一步改动。",
+      "takeaways": []
     },
     {
       kind: "chapter",
       "id": "chap-6",
-      "title": "Pareto 搜索：保留互补强项",
-      "badge": "inf",
-      "badgeLabel": "基础 · 推理",
-      "bridge": "SI 让一次反思更有方向，但搜索还要回答：<b>哪些旧候选值得继续当父代？</b>只留平均分第一会过早收敛。",
+      "title": "让搜索保持“多样性”：Pareto-based Search",
+      "badge": "trn",
+      "badgeLabel": "CORE · DIVERSITY",
+      "bridge": "第五章解决了“下一步往哪里改”，但搜索还要决定“哪些候选值得继续改”。当候选分别擅长不同任务、样例或指标时，一个平均分会抹掉这些局部优势；只保留平均分冠军，候选池很快只剩下一种解题思路。",
       "analogy": {
-        "title": "不只留下“总分第一”",
-        "text": "一个折法也许飞得最远，另一个最稳。Pareto 前沿让这些互补父代都活下来。",
-        componentId: "paper-plane-lab"
+        "title": "平均分最优，不等于每个维度都最有价值",
+        "text": "一个候选可能只在部分任务或指标上突出。Pareto Frontier 保留未被全面支配的候选，让这些局部优势继续参与后续搜索。",
+        componentId: "optimize-anything-lab"
       },
       "modules": [
         {
           kind: "module",
           "id": "6.1",
-          "title": "点击候选，判断谁该留下",
-          "desc": "点击二维目标图中的候选。反馈会同时更新支配关系、前沿成员身份与后续被选择的理由。",
-          componentId: "paper-plane-lab"
+          "title": "先看平均分：两个局部最强候选如何消失",
+          "desc": "下面三个候选使用教学用示意分数。把 Task A 与 Task B 压成平均分时，系统只会看到候选 C 排名第一；展开逐任务表现后，候选 A 和 B 各自拥有无法由 C 替代的局部优势。",
+          componentId: "optimize-anything-lab"
+        },
+        {
+          kind: "module",
+          "id": "6.2",
+          "title": "Pareto Frontier：只删除被全面超过的候选",
+          "desc": "点击任一候选，检查是否存在另一个候选在所有维度都不差、并且至少一个维度更好。只有满足这个条件，前者才会被支配。论文按 per-task 或 SI 中的 per-metric 子分数维护这种多维比较。",
+          componentId: "optimize-anything-lab"
         }
       ],
-      "formula": {
-        "lead": "若没有另一个候选在所有目标都不差且至少一项更好，它就属于前沿。",
-        "unicode": "P = { Φ | ¬∃Ψ : Ψ ≻ Φ }；Pr(select Φ) ∝ |{ j∈J : Φ∈B[j] }|",
-        "symbols": [
-          {
-            "sym": "P",
-            "desc": "Pareto 非支配候选集合。"
-          },
-          {
-            "sym": "Φ",
-            "desc": "当前候选文本制品。"
-          },
-          {
-            "sym": "Ψ",
-            "desc": "用于检查支配关系的另一个候选。"
-          },
-          {
-            "sym": "J",
-            "desc": "逐任务、逐指标或两者组成的目标索引集合。"
-          },
-          {
-            "sym": "B[j]",
-            "desc": "在目标 j 上达到最佳分数的前沿候选集合。"
-          }
-        ]
-      },
-      "takeaways": [
-        {
-          "icon": "🎯",
-          "title": "不被支配",
-          "desc": "前沿不是平均分排行榜。"
-        },
-        {
-          "icon": "🔧",
-          "title": "互补父代",
-          "desc": "不同强项为后续反思提供结构多样性。"
-        },
-        {
-          "icon": "✨",
-          "title": "后端可替换",
-          "desc": "Pareto 是当前默认机制，不等于 API 本身。"
-        }
-      ]
+      "insight": "平均分只回答“整体谁更高”；Pareto Frontier 还保留“谁在哪个局部不可替代”。这些互补候选会继续作为后续 Reflection 与 Mutation 的父本，也成为下一章 Multi-task Search 共享经验的基础。",
+      "takeaways": []
     },
     {
       kind: "chapter",
       "id": "chap-7",
-      "title": "跨任务迁移：何时共享经验",
-      "badge": "trn",
-      "badgeLabel": "训练进阶",
-      "bridge": "Pareto 前沿能保存多种模式，于是一个任务发现的技巧可以影响另一个任务。关键问题是：<b>它们真的相关吗？</b>",
+      "title": "一个接口，三种 Optimization Modes",
+      "badge": "both",
+      "badgeLabel": "CORE · MODES",
+      "bridge": "第六章说明了候选池如何保存互补经验。现在改变问题配置：是否提供 <code>dataset</code> 与 <code>valset</code>，会让同一套优化接口分别成为 Single-task Search、Multi-task Search 或 Generalization。",
       "analogy": {
-        "title": "好折法能迁移，坏类比会添乱",
-        "text": "CUDA 任务共享向量化与归约技巧；不同 n 的圆堆积却没有稳定可迁移结构。",
-        componentId: "paper-plane-lab"
+        "title": "三种模式的区别在输入、共享机制与输出",
+        "text": "Single-task 优化一个任务；Multi-task 在相关任务间共享搜索中的 Pareto Frontier，并分别输出专用解；Generalization 学习一个用于未见样例的全局 Artifact。",
+        componentId: "optimize-anything-lab"
       },
       "modules": [
         {
           kind: "module",
           "id": "7.1",
-          "title": "沿着迁移链走一遍",
-          "desc": "选择相关 CUDA 或不相关圆堆积，再逐步观察“发现模式—保留前沿—跨题提议—验证结果”。任务族只能在起点切换，保证比较公平。",
-          componentId: "paper-plane-lab"
+          "title": "两个可选参数，决定三种模式",
+          "desc": "切换模式，观察共同的 <code>seed / objective + evaluator</code> 如何保持不变，而 <code>dataset</code>、<code>valset</code>、搜索语义与输出数量同步变化。模式不是三套 API，而是同一个调用在不同数据配置下的三种含义。",
+          componentId: "optimize-anything-lab"
+        },
+        {
+          kind: "module",
+          "id": "7.2",
+          "title": "Multi-task 何时迁移，何时产生负迁移？",
+          "desc": "Multi-task 的前提不是“任务越多越好”，而是任务之间存在可复用结构。相关 CUDA Kernel 可以共享 memory coalescing、vectorized access 与 warp-level reduction 等模式；不同 N 的 Circle Packing 相互独立，联合搜索反而引入噪声。",
+          componentId: "optimize-anything-lab"
         }
       ],
-      "takeaways": [
-        {
-          "icon": "🎯",
-          "title": "共享的是模式",
-          "desc": "多任务并不输出一个万能解。"
-        },
-        {
-          "icon": "🔧",
-          "title": "相关性是前提",
-          "desc": "结构不共享时，迁移会引入噪声。"
-        },
-        {
-          "icon": "✨",
-          "title": "预算要对齐",
-          "desc": "论文比较使用等价的单任务预算。"
-        }
-      ]
+      "insight": "Single-task 返回一个问题的专用解；Multi-task 在搜索中共享 Frontier，但为每个任务分别输出专用解；Generalization 用训练反馈优化一个全局 Artifact，再由 valset 检查它能否面对未见样例。",
+      "takeaways": []
     },
     {
       kind: "chapter",
       "id": "chap-8",
-      "title": "系统结构：小接口，完整搜索栈",
-      "badge": "trn",
-      "badgeLabel": "训练进阶",
-      "bridge": "到这里，核心机制都已出现。现在才适合打开系统结构：一个小 API 背后，<b>解析、缓存、SI、前沿、反思和后端适配</b>如何协同？",
+      "title": "原理总装：四个设计如何组成统一优化器",
+      "badge": "both",
+      "badgeLabel": "CORE · SYNTHESIS",
+      "bridge": "前面六章分别解释了统一接口、优化循环、Side Information、Pareto-based Search 与三种 Optimization Modes。本章不再引入新概念，只把这些设计装回同一套系统，回答它们如何共同推动一次完整搜索。",
       "analogy": {
-        "title": "一个小夹子，稳住整片机翼",
-        "text": "用户看到的是一个小 API，背后却需要解析、缓存、SI、前沿与后端适配协同。",
-        componentId: "paper-plane-lab"
+        "title": "现在可以重新回答第一章的问题",
+        "text": "不同对象不需要拥有相同语法或目标。对象内容进入 <b>Text Artifact</b>，领域差异进入 <b>Evaluator</b>；上层框架只负责反复评价、诊断、改写和比较候选。",
+        componentId: "optimize-anything-lab"
       },
       "modules": [
         {
           kind: "module",
           "id": "8.1",
-          "title": "点击组件，追踪一次候选更新",
-          "desc": "点击系统节点或逐步前进。选中节点、下游路径、输入输出和反馈会同步变化；“ARC 四阶段代理”被明确标为搜索产物，而不是框架节点。",
-          componentId: "paper-plane-lab"
+          "title": "完整闭环：候选如何改进，又如何进入下一轮",
+          "desc": "从 Pareto Frontier 选择候选，交给 Evaluator 真实运行；Score 用于比较，Side Information 解释问题；LLM 据此形成 Reflection 并执行 Mutation。新候选 x′ 必须重新评价，再按逐任务或逐指标表现更新 Pareto Frontier，随后进入下一轮。",
+          componentId: "optimize-anything-lab"
+        },
+        {
+          kind: "module",
+          "id": "8.2",
+          "title": "四个关键设计，各自解决什么问题？",
+          "desc": "统一接口让不同任务能够进入同一框架；Side Information 让改写有方向；Pareto-based Search 保留互补候选；Optimization Mode 决定搜索面对的是一个任务、多个相关任务，还是一个需要泛化的全局候选。",
+          componentId: "optimize-anything-lab"
         }
       ],
-      "takeaways": [
-        {
-          "icon": "🎯",
-          "title": "声明式入口",
-          "desc": "用户声明 what，不必配置每个搜索细节。"
-        },
-        {
-          "icon": "🔧",
-          "title": "搜索栈完整",
-          "desc": "解析、缓存、SI、前沿与反思共同工作。"
-        },
-        {
-          "icon": "✨",
-          "title": "分清两层",
-          "desc": "ARC 四阶段代理是被发现的制品，不是框架本体。"
-        }
-      ]
+      "insight": "这篇论文的核心不是某一种 mutation 技巧，而是把统一表示、可诊断反馈、多样性搜索与不同任务模式接成同一个可复用优化框架。",
+      "takeaways": []
     },
     {
       kind: "chapter",
       "id": "chap-9",
-      "title": "适用边界、成本与提议模型",
-      "badge": "trn",
-      "badgeLabel": "训练进阶",
-      "bridge": "机制完整，不代表任何项目都值得上。现在把论文的限制转成一张<b>可操作的适用性地图</b>。",
+      "title": "实验结果总览：数据支持了哪些主张？",
+      "badge": "both",
+      "badgeLabel": "CORE · EVIDENCE",
+      "bridge": "这一章集中展示论文的实验结论，不追踪某个案例的具体演化过程。所有结果按“数据是什么、比较对象是谁、它支持什么结论”组织：先看跨领域表现，再看关键机制消融，最后看成本与失效边界。",
       "analogy": {
-        "title": "先选对风场，再谈飞多快",
-        "text": "能文本化不代表值得优化；评估成本、任务相关性和 SI 设计常常决定成败。",
-        componentId: "paper-plane-lab"
+        "title": "如何判断 Universal 的主张是否成立？",
+        "text": "需要四类证据共同支撑：跨领域结果、SI 消融、Single-task 与 Multi-task 对照，以及揭示失效条件的反例。这里先读结论和数据口径，不展开逐实验复盘。",
+        componentId: "optimize-anything-lab"
       },
       "modules": [
         {
           kind: "module",
           "id": "9.1",
-          "title": "把场景放到适用性地图上",
-          "desc": "拖动场景标记，探索“任务相关性 × 评估可承受性”。文本代理与自动评估器缺失时，地图会直接给出不可用原因。",
-          componentId: "paper-plane-lab"
-        }
-      ],
-      "takeaways": [
-        {
-          "icon": "🎯",
-          "title": "先验边界",
-          "desc": "文本代理和评估器缺一不可。"
+          "title": "跨领域主结果：一个接口覆盖了什么？",
+          "desc": "六类主实验覆盖 Skill、调度策略、完整 Agent、Prompt、CUDA Kernel 与数值算法；论文还用图像生成和数值黑箱优化补充展示接口范围。各任务指标不同，因此每张卡只比较该任务自己的基线与优化结果。",
+          componentId: "optimize-anything-lab"
         },
-        {
-          "icon": "🔧",
-          "title": "成本来自评估",
-          "desc": "复杂代理任务的评估器可能主导总花费。"
-        },
-        {
-          "icon": "✨",
-          "title": "领域知识仍重要",
-          "desc": "好 SI 需要知道哪些诊断真正可行动。"
-        }
-      ]
-    },
-    {
-      kind: "chapter",
-      "id": "chap-10",
-      "title": "六域结果与诚实结论",
-      "badge": "both",
-      "badgeLabel": "推理 + 训练",
-      "bridge": "最后读结果。请始终把数值与<b>模型、硬件、数据划分、基线和指标方向</b>放在一起，而不是寻找一个跨域总冠军。",
-      "analogy": {
-        "title": "同一赛道，先看计分规则",
-        "text": "89.5%、40.2% 和 2.63598 都很亮眼，但来自不同任务、基线与指标，不能混成一个总效果量。",
-        componentId: "paper-plane-lab"
-      },
-      "modules": [
         {
           kind: "module",
-          "id": "10.1",
-          "title": "选择指标，再开始验证赛",
-          "desc": "先选一个结果协议，再启动比较。每次只在兼容尺度上运动，精确数值与适用边界始终保留。",
-          componentId: "paper-plane-lab"
+          "id": "9.2",
+          "title": "关键机制消融：SI 与 Multi-task 真的有效吗？",
+          "desc": "Side Information 的受控消融覆盖 Prompt、Circle Packing 与 KernelBench；Multi-task scaling 则比较相关 CUDA 任务在相同单题预算下的表现。这里集中展示差值，同时标明哪些阈值改善、哪些没有改善。",
+          componentId: "optimize-anything-lab"
+        },
+        {
+          kind: "module",
+          "id": "9.3",
+          "title": "成本与反例：这些结果不能被怎样外推？",
+          "desc": "实验也给出了 Universal 的现实边界：不相关任务会产生负迁移，更强 proposer 通常得到更好结果但成本更高，不同 evaluator 的执行成本差异很大。最后还要区分两种证据口径：Figure 8 使用 MT 表现最好的 10 个任务，Table 7 则报告 20 个随机任务。",
+          componentId: "optimize-anything-lab"
         }
       ],
-      "formula": {
-        "lead": "CUDA 图中的 Fastₚ(s) 统计达到某个加速阈值的任务比例。",
-        "unicode": "Fastₚ(s) = |{ i : speedupᵢ ≥ s }| / p",
-        "symbols": [
-          {
-            "sym": "Fastₚ",
-            "desc": "在固定阈值与硬件下达到要求的任务比例。"
-          },
-          {
-            "sym": "s",
-            "desc": "相对 PyTorch 的加速阈值。"
-          },
-          {
-            "sym": "p",
-            "desc": "经过正确性检查的评估任务数。"
-          },
-          {
-            "sym": "speedupᵢ",
-            "desc": "任务 i 相对 PyTorch 基线的速度比。"
-          }
-        ]
-      },
-      "takeaways": [
-        {
-          "icon": "🎯",
-          "title": "广度是贡献",
-          "desc": "一个 API 覆盖六个主要领域与三种模式。"
-        },
-        {
-          "icon": "🔧",
-          "title": "协议不可省",
-          "desc": "数值必须与模型、硬件、基线和指标方向一起读。"
-        },
-        {
-          "icon": "✨",
-          "title": "通用不等于无条件",
-          "desc": "文本代理、成本、相关性与 SI 质量仍决定成败。"
-        }
-      ]
+      "insight": "综合来看，实验支持“统一接口能够跨多类文本化问题取得有竞争力的结果”，也支持 SI 与相关任务间 Multi-task transfer 的作用；但它不支持无条件迁移、固定成本或全局最优保证。",
+      "takeaways": []
     }
   ],
   "bilibili": [
     {
       bvid: "BV1zkzRBSE4X",
       "title": "工作流 Agent 多 Prompt 联合优化（1）GEPA：超越 GRPO，让 Prompt 像基因一样进化",
-      "reason": "直接讲解论文默认后端 GEPA；播放量较低，但与核心算法最直接相关。",
+      "reason": "直接讲解论文默认 GEPA 后端；用于补充反思—变异—保留候选的搜索背景。",
       "cover": "https://i2.hdslb.com/bfs/archive/70e1ba7a0950121bc341181ce2caf125550f5aed.jpg",
       "views": "1103播放"
     },
@@ -561,14 +325,14 @@ export const tutorial: TutorialData = {
     {
       bvid: "BV1ov4y1H7GK",
       "title": "ChatGPT 提示词工程师教程",
-      "reason": "补足提示词工程和迭代改写的基础背景。",
+      "reason": "补足提示词工程和迭代改写的基础背景，不作为论文实验依据。",
       "cover": "https://i1.hdslb.com/bfs/archive/e003ea9d7899a1d6768044ac8b76919a4e9fd0cc.png",
       "views": "46.1万播放"
     },
     {
       bvid: "BV1NHmsBwEbT",
       "title": "15分钟从 Prompt Engineering 到 Agent！",
-      "reason": "把提示词、Agent 和系统增强技术放进同一张概念地图。",
+      "reason": "帮助把 Prompt、Agent 与系统级优化对象放进同一概念地图。",
       "cover": "https://i2.hdslb.com/bfs/archive/495022df07137146d00e3ac2ba60868553fa4efe.jpg",
       "views": "1.8万播放"
     }

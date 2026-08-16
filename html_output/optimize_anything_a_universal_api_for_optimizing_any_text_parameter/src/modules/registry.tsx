@@ -1,6 +1,6 @@
 import React from 'react';
 import { ExampleSlider } from './exampleSlider';
-import { PaperPlaneLab } from './paper-plane-lab';
+import { OptimizeAnythingLab } from './optimize-anything-lab';
 
 export interface WidgetProps {
   chapterId: string;
@@ -9,4 +9,4 @@ export interface WidgetProps {
 
 export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
 widgetRegistry['example-slider'] = ExampleSlider;
-widgetRegistry['paper-plane-lab'] = PaperPlaneLab;
+widgetRegistry['optimize-anything-lab'] = OptimizeAnythingLab;

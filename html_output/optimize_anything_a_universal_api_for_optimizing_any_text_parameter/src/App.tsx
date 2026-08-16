@@ -32,41 +32,46 @@ export default function App() {
 
   return (
     <>
-      <Hero meta={tutorial.meta} hero={tutorial.hero} onStart={begin} started={revealed > 0} />
+      <Hero meta={tutorial.meta} hero={tutorial.hero} firstChapterTitle={tutorial.chapters[0]?.title || ''} onStart={begin} started={revealed > 0} />
       <main>
         {tutorial.chapters.map((ch, idx) => {
           const isVisible = revealed >= idx + 1;
           if (!isVisible) return null;
           const nextNum = idx + 2;
+          const nextChapter = tutorial.chapters[idx + 1];
           const isLast = idx === total - 1;
           return (
-            <section className="chap" id={ch.id} key={ch.id}>
-              <h2 className="chap-title">
-                <span className="num">§{idx + 1}.</span>
-                {ch.title}
-                <span className={`badge-tag ${ch.badge}`}>{ch.badgeLabel}</span>
-              </h2>
-              <FlowMini total={total} revealed={revealed} />
-              <ChapterBridge text={ch.bridge} />
-              <AnalogyCard analogy={ch.analogy} chapterId={ch.id} />
-              {ch.modules.map((m) => (
-                <Module key={m.id} module={m} chapterId={ch.id} />
-              ))}
-              {ch.insight ? <InsightBar text={ch.insight} /> : null}
-              {ch.formula ? <Formula formula={ch.formula} /> : null}
-              <Takeaway items={ch.takeaways} />
+            <React.Fragment key={ch.id}>
+              <section className="chap" id={ch.id}>
+                <h2 className="chap-title">
+                  <span className="num">§{idx + 1}.</span>
+                  {ch.title}
+                  <span className={`badge-tag ${ch.badge}`}>{ch.badgeLabel}</span>
+                </h2>
+                <FlowMini total={total} revealed={revealed} />
+                <ChapterBridge text={ch.bridge} />
+                {!['chap-1', 'chap-2', 'chap-3', 'chap-4', 'chap-5', 'chap-6', 'chap-7', 'chap-8', 'chap-9'].includes(ch.id) ? <AnalogyCard analogy={ch.analogy} chapterId={ch.id} /> : null}
+                {ch.modules.map((m) => (
+                  <Module key={m.id} module={m} chapterId={ch.id} showNumber={ch.modules.length > 1} />
+                ))}
+                {ch.insight ? <InsightBar text={ch.insight} /> : null}
+                {ch.formula ? <Formula formula={ch.formula} /> : null}
+                {ch.takeaways.length > 0 ? <Takeaway items={ch.takeaways} /> : null}
+                {isLast ? (
+                  // End of the last chapter: append Bilibili recommendations here when present.
+                  bili.length > 0 ? <BiliVideos items={bili} /> : null
+                ) : null}
+              </section>
               {idx === revealed - 1 && !isLast ? (
-                <div className="chap-loader">
-                  <div className="chap-loader-hint" />
+                <div className="chap-loader chapter-transition">
+                  <div className="chap-loader-hint">本章结束 · 继续探索</div>
                   <button className="chap-loader-btn" onClick={revealNext}>
-                    继续学习 §{nextNum} <span className="chap-loader-arrow">→</span>
+                    <span className="chap-loader-title">§{nextNum} {nextChapter.title}</span>
+                    <span className="chap-loader-arrow">→</span>
                   </button>
                 </div>
-              ) : isLast ? (
-                // End of the last chapter: append Bilibili recommendations here when present.
-                bili.length > 0 ? <BiliVideos items={bili} /> : null
               ) : null}
-            </section>
+            </React.Fragment>
           );
         })}
       </main>

@@ -3,7 +3,6 @@
 export function ChapterBridge({ text }: { text: string }) {
   return (
     <div className="chap-bridge">
-      <div className="cb-icon">🔗</div>
       <div className="cb-body">
         <div className="cb-title">本节作用</div>
         <div className="cb-text" dangerouslySetInnerHTML={{ __html: text }} />

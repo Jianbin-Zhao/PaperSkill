@@ -23,7 +23,18 @@
     "authors": [
       "Lakshya A Agrawal",
       "Donghyun Lee",
-      "Shangyin Tan"
+      "Shangyin Tan",
+      "Wenjie Ma",
+      "Karim Elmaaroufi",
+      "Rohit Sandadi",
+      "Sanjit A. Seshia",
+      "Koushik Sen",
+      "Dan Klein",
+      "Ion Stoica",
+      "Joseph E. Gonzalez",
+      "Omar Khattab",
+      "Alexandros G. Dimakis",
+      "Matei Zaharia"
     ],
     "year": 2026,
     "venue": "CAIS 2026",
@@ -37,7 +48,9 @@
     "topics": [
       "LLM optimization",
       "text artifacts",
+      "side information",
       "Pareto search",
+      "multi-task transfer",
       "agent systems"
     ],
     "skillVersion": "1.3.0",

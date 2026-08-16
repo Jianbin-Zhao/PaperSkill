@@ -8,11 +8,13 @@ import { widgetRegistry } from '../modules/registry';
 export function Hero({
   meta,
   hero,
+  firstChapterTitle,
   onStart,
   started,
 }: {
   meta: Meta;
   hero: HeroConfig;
+  firstChapterTitle: string;
   onStart: () => void;
   started: boolean;
 }) {
@@ -38,7 +40,7 @@ export function Hero({
 
         <div className="hero-compare">
           <div className="bg-side old">
-            <div className="bg-side-head">传统方法</div>
+            <div className="bg-side-head">传统的对象专用优化流程</div>
             <div className="bg-side-canvas">
               {OldWidget ? <OldWidget chapterId="hero" moduleId="old" /> : null}
               {hero.oldMethod.figure ? (
@@ -48,7 +50,7 @@ export function Hero({
             <div className="bg-side-tag" dangerouslySetInnerHTML={{ __html: hero.oldMethod.desc }} />
           </div>
           <div className="bg-side new">
-            <div className="bg-side-head">本文方法</div>
+            <div className="bg-side-head">optimize_anything 的统一接口</div>
             <div className="bg-side-canvas">
               {NewWidget ? <NewWidget chapterId="hero" moduleId="new" /> : null}
               {hero.newMethod.figure ? (
@@ -63,7 +65,8 @@ export function Hero({
           <div className="chap-loader">
             <div className="chap-loader-hint">准备好了吗？</div>
             <button className="chap-loader-btn" onClick={onStart}>
-              开始学习 §1 <span className="chap-loader-arrow">→</span>
+              <span className="chap-loader-title">§1 {firstChapterTitle}</span>
+              <span className="chap-loader-arrow">→</span>
             </button>
           </div>
         ) : null}
