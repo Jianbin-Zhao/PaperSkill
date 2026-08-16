@@ -2027,3 +2027,439 @@ button.tiny {
     overflow-wrap: anywhere;
   }
 }
+
+/* Defense navigation: concise section names stay visible during a presentation,
+   while the document keeps its original progressive chapter structure. */
+.defense-nav {
+  position: fixed;
+  z-index: 40;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 218px;
+  padding: 26px 16px 20px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.96);
+  border-right: 1px solid var(--line);
+  box-shadow: 10px 0 32px rgba(25, 42, 70, 0.06);
+  backdrop-filter: blur(16px);
+}
+
+.defense-nav-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: 1px 8px;
+  margin: 0 5px 18px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--line);
+}
+
+.defense-nav-kicker {
+  grid-column: 1 / -1;
+  color: var(--orange);
+  font-family: var(--ui-font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.defense-nav-head strong {
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.defense-nav-progress {
+  color: var(--slate-2);
+  font-family: var(--ui-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.8;
+}
+
+.defense-nav-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--ui-radius-sm);
+  color: var(--slate);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.defense-nav-toggle:hover {
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-color: rgba(39, 68, 110, 0.28);
+}
+
+.defense-nav-list {
+  display: grid;
+  gap: 3px;
+  margin: 3px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.defense-nav-item {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) 7px;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 9px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--ui-radius-sm);
+  color: var(--slate);
+  text-align: left;
+}
+
+.defense-nav-item:hover {
+  background: var(--paper-2);
+  border-color: var(--line);
+  color: var(--ink);
+  transform: translateX(2px);
+}
+
+.defense-nav-item.is-active {
+  background: var(--blue-soft);
+  border-color: rgba(39, 68, 110, 0.22);
+  color: var(--blue);
+  box-shadow: inset 3px 0 0 var(--blue);
+}
+
+.defense-nav-overview {
+  margin-bottom: 3px;
+}
+
+.defense-nav-conclusion {
+  margin-top: 8px;
+  border-top-color: var(--line);
+}
+
+.defense-nav-num {
+  color: var(--slate-2);
+  font-family: var(--ui-font-mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.defense-nav-item.is-active .defense-nav-num {
+  color: var(--blue);
+}
+
+.defense-nav-label {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.defense-nav-state {
+  width: 6px;
+  height: 6px;
+  border: 1.5px solid var(--line-2);
+  border-radius: 50%;
+}
+
+.defense-nav-item.is-revealed .defense-nav-state {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.defense-nav-item.is-active .defense-nav-state {
+  background: var(--blue);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(39, 68, 110, 0.12);
+}
+
+.defense-content {
+  min-width: 0;
+  margin-left: 218px;
+}
+
+.defense-nav.is-collapsed {
+  width: 52px;
+  padding: 18px 10px;
+  overflow: hidden;
+}
+
+.defense-nav.is-collapsed .defense-nav-head {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.defense-nav.is-collapsed .defense-nav-kicker,
+.defense-nav.is-collapsed .defense-nav-head > strong,
+.defense-nav.is-collapsed .defense-nav-progress,
+.defense-nav.is-collapsed nav {
+  display: none;
+}
+
+.defense-nav.is-collapsed .defense-nav-toggle {
+  width: 32px;
+  height: 32px;
+}
+
+.defense-shell.is-nav-collapsed .defense-content {
+  margin-left: 52px;
+}
+
+.defense-conclusion {
+  scroll-margin-top: 24px;
+  min-height: calc(100vh - 24px);
+  margin: 42px 0 0;
+  padding: 42px 4px 28px;
+  border-top: 2px solid var(--ink);
+}
+
+.defense-conclusion-kicker {
+  color: var(--orange);
+  font-family: var(--ui-font-mono);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.defense-conclusion h2 {
+  max-width: 760px;
+  margin: 7px 0 12px;
+  color: var(--ink);
+  font-size: 34px;
+  line-height: 1.25;
+}
+
+.defense-conclusion-lead {
+  max-width: 840px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+.defense-conclusion-points {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 32px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.defense-conclusion-point {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 7px 10px;
+  padding: 22px 22px 24px;
+}
+
+.defense-conclusion-point + .defense-conclusion-point {
+  border-left: 1px solid var(--line);
+}
+
+.defense-conclusion-point > span {
+  grid-row: 1 / 3;
+  color: var(--blue);
+  font-family: var(--ui-font-mono);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.defense-conclusion-point strong {
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.defense-conclusion-point p {
+  grid-column: 2;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.defense-conclusion-line {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 18px;
+  padding: 18px 0;
+}
+
+.defense-conclusion-line span {
+  color: var(--orange);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.defense-conclusion-line strong {
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1.55;
+}
+
+@media (max-width: 980px) {
+  .defense-nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: auto;
+    width: 100%;
+    height: 76px;
+    padding: 9px 12px 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 8px 22px rgba(25, 42, 70, 0.08);
+  }
+
+  .defense-nav-head {
+    position: sticky;
+    z-index: 2;
+    left: 0;
+    display: flex;
+    align-items: center;
+    width: max-content;
+    height: 26px;
+    margin: 0 8px 4px 0;
+    padding: 0 12px 0 2px;
+    background: rgba(255, 255, 255, 0.98);
+    border: 0;
+  }
+
+  .defense-nav-kicker,
+  .defense-nav-progress {
+    display: none;
+  }
+
+  .defense-nav-head strong {
+    font-size: 14px;
+  }
+
+  .defense-nav nav,
+  .defense-nav-list {
+    display: flex;
+    width: max-content;
+    gap: 4px;
+  }
+
+  .defense-nav nav {
+    align-items: center;
+  }
+
+  .defense-nav-list {
+    margin: 0;
+  }
+
+  .defense-nav-item {
+    display: flex;
+    width: auto;
+    min-height: 31px;
+    padding: 5px 9px;
+  }
+
+  .defense-nav-item:hover {
+    transform: none;
+  }
+
+  .defense-nav-state {
+    display: none;
+  }
+
+  .defense-nav-label {
+    max-width: 96px;
+    font-size: 12px;
+  }
+
+  .defense-nav-overview {
+    margin: 0;
+  }
+
+  .defense-nav-conclusion {
+    margin: 0;
+  }
+
+  .defense-content {
+    margin-left: 0;
+    padding-top: 76px;
+  }
+
+  .defense-nav.is-collapsed {
+    width: 52px;
+    height: 44px;
+    padding: 6px 10px;
+    border-right: 1px solid var(--line);
+  }
+
+  .defense-shell.is-nav-collapsed .defense-content {
+    margin-left: 0;
+    padding-top: 44px;
+  }
+
+  section.chap {
+    scroll-margin-top: 92px;
+  }
+
+  .defense-conclusion {
+    scroll-margin-top: 60px;
+  }
+}
+
+@media (max-width: 720px) {
+  .defense-conclusion {
+    margin-top: 28px;
+    min-height: auto;
+    padding: 32px 2px 20px;
+  }
+
+  .defense-conclusion h2 {
+    font-size: 28px;
+  }
+
+  .defense-conclusion-lead {
+    font-size: 16px;
+  }
+
+  .defense-conclusion-points {
+    grid-template-columns: 1fr;
+    margin: 24px 0;
+  }
+
+  .defense-conclusion-point {
+    padding: 18px 10px;
+  }
+
+  .defense-conclusion-point + .defense-conclusion-point {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+
+  .defense-conclusion-line {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .defense-conclusion-line strong {
+    font-size: 19px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .defense-nav-item:hover {
+    transform: none;
+  }
+}

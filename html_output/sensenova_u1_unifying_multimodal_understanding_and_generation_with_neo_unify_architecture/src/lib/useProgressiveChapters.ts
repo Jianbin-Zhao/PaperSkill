@@ -15,5 +15,10 @@ export function useProgressiveChapters(total: number) {
     [total]
   );
 
-  return { revealed, begin, revealNext };
+  const revealThrough = useCallback(
+    (chapterNumber: number) => setRevealed((n) => Math.max(n, Math.min(chapterNumber, total))),
+    [total]
+  );
+
+  return { revealed, begin, revealNext, revealThrough };
 }

@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { tutorial } from './data/tutorial';
 import { Hero } from './components/Hero';
+import { DefenseNav } from './components/DefenseNav';
+import { DefenseConclusion } from './components/DefenseConclusion';
 import { FlowMini } from './components/FlowMini';
 import { ChapterBridge } from './components/ChapterBridge';
 import { AnalogyCard } from './components/AnalogyCard';
@@ -12,8 +14,11 @@ import { useProgressiveChapters } from './lib/useProgressiveChapters';
 
 export default function App() {
   const total = tutorial.chapters.length;
-  const { revealed, begin, revealNext } = useProgressiveChapters(total);
+  const { revealed, begin, revealNext, revealThrough } = useProgressiveChapters(total);
   const bili = tutorial.bilibili || [];
+  const [activeId, setActiveId] = useState('overview');
+  const [pendingChapterId, setPendingChapterId] = useState<string | null>(null);
+  const [navCollapsed, setNavCollapsed] = useState(false);
 
   // Auto-scroll to the most recently revealed chapter so the "next chapter" button
   // lands the new section in view instead of leaving it below the fold.
@@ -29,10 +34,105 @@ export default function App() {
     return () => cancelAnimationFrame(id);
   }, [revealed]);
 
+  // Large canvas modules establish their height just after mounting. Re-align a
+  // direct navigation target briefly so those layout shifts cannot push it away.
+  useEffect(() => {
+    if (!pendingChapterId) return;
+    const isConclusion = pendingChapterId === 'defense-conclusion';
+    const chapterIndex = tutorial.chapters.findIndex((chapter) => chapter.id === pendingChapterId);
+    const requiredRevealed = isConclusion ? total : chapterIndex + 1;
+    if ((!isConclusion && chapterIndex < 0) || revealed < requiredRevealed) return;
+
+    const delays = [0, 120, 300, 600, 1000, 1600];
+    const timers = delays.map((delay, index) =>
+      window.setTimeout(() => {
+        document.getElementById(pendingChapterId)?.scrollIntoView({ behavior: 'auto', block: 'start' });
+        if (index === delays.length - 1) setPendingChapterId(null);
+      }, delay)
+    );
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [pendingChapterId, revealed, total]);
+
+  useEffect(() => {
+    let frame = 0;
+    const updateActiveChapter = () => {
+      frame = 0;
+      const marker = Math.min(220, window.innerHeight * 0.28);
+      let nextId = 'overview';
+
+      for (let index = 0; index < revealed; index += 1) {
+        const chapter = tutorial.chapters[index];
+        const element = document.getElementById(chapter.id);
+        if (!element) continue;
+        if (element.getBoundingClientRect().top <= marker) nextId = chapter.id;
+        else break;
+      }
+
+      const conclusion = document.getElementById('defense-conclusion');
+      const isAtPageEnd = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4;
+      if (conclusion && (conclusion.getBoundingClientRect().top <= marker || isAtPageEnd)) {
+        nextId = 'conclusion';
+      }
+
+      setActiveId((current) => (current === nextId ? current : nextId));
+    };
+    const scheduleUpdate = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(updateActiveChapter);
+    };
+
+    updateActiveChapter();
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+    };
+  }, [revealed]);
+
+  const navigateTo = useCallback(
+    (chapterIndex: number | null) => {
+      if (chapterIndex === null) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      const chapter = tutorial.chapters[chapterIndex];
+      if (!chapter) return;
+      if (chapterIndex >= revealed) {
+        setPendingChapterId(chapter.id);
+        revealThrough(chapterIndex + 1);
+        return;
+      }
+      document.getElementById(chapter.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+    [revealed, revealThrough]
+  );
+
+  const navigateToConclusion = useCallback(() => {
+    if (revealed < total) {
+      setPendingChapterId('defense-conclusion');
+      revealThrough(total);
+      return;
+    }
+    document.getElementById('defense-conclusion')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [revealed, revealThrough, total]);
+
   return (
-    <>
-      <Hero meta={tutorial.meta} hero={tutorial.hero} onStart={begin} started={revealed > 0} />
-      <main>
+    <div className={`defense-shell${navCollapsed ? ' is-nav-collapsed' : ''}`}>
+      <DefenseNav
+        chapters={tutorial.chapters}
+        activeId={activeId}
+        revealed={revealed}
+        collapsed={navCollapsed}
+        onNavigate={navigateTo}
+        onConclusion={navigateToConclusion}
+        onToggle={() => setNavCollapsed((collapsed) => !collapsed)}
+      />
+      <div className="defense-content">
+        <Hero meta={tutorial.meta} hero={tutorial.hero} onStart={begin} started={revealed > 0} />
+        <main>
         {tutorial.chapters.map((ch, idx) => {
           const isVisible = revealed >= idx + 1;
           if (!isVisible) return null;
@@ -68,7 +168,9 @@ export default function App() {
             </section>
           );
         })}
-      </main>
-    </>
+        {revealed === total ? <DefenseConclusion /> : null}
+        </main>
+      </div>
+    </div>
   );
 }
