@@ -188,6 +188,30 @@
     "tutorialUrl": "papers/infinite_worlds_with_versatile_interactions/"
   },
   {
+    "paperName": "inspatio_world_a_real_time_4d_world_simulator_via_spatiotemporal_autoregressive_modeling",
+    "title": "InSpatio-World: A Real-Time 4D World Simulator via Spatiotemporal Autoregressive Modeling",
+    "authors": [],
+    "year": 2026,
+    "venue": "arXiv preprint",
+    "paperUrl": "https://arxiv.org/abs/2604.07209",
+    "participants": [
+      {
+        "name": "lyaqiqi",
+        "github": "lyaqiqi"
+      }
+    ],
+    "topics": [
+      "world model",
+      "video generation",
+      "4D",
+      "autoregressive",
+      "diffusion"
+    ],
+    "skillVersion": "1.3.0",
+    "status": "review",
+    "tutorialUrl": "papers/inspatio_world_a_real_time_4d_world_simulator_via_spatiotemporal_autoregressive_modeling/"
+  },
+  {
     "paperName": "longcat_video_avatar_1_5_technical_report",
     "title": "LongCat-Video-Avatar 1.5 Technical Report",
     "authors": [
@@ -363,6 +387,24 @@
     "tutorialUrl": "papers/transcoders_for_investigating_deception_in_language_models/"
   },
   {
+    "paperName": "unified_zero_shot_time_series_forecasting_a_darts_foundation",
+    "title": "Unified Zero-Shot Time Series Forecasting: A Darts Foundation",
+    "authors": [],
+    "year": null,
+    "venue": "",
+    "paperUrl": "https://arxiv.org/pdf/2606.27438",
+    "participants": [
+      {
+        "name": "GMY",
+        "github": "HardenMYG"
+      }
+    ],
+    "topics": [],
+    "skillVersion": "1.3.0",
+    "status": "review",
+    "tutorialUrl": "papers/unified_zero_shot_time_series_forecasting_a_darts_foundation/"
+  },
+  {
     "paperName": "unlimited_ocr_works",
     "title": "Unlimited OCR Works",
     "authors": [],
@@ -379,6 +421,36 @@
     "skillVersion": "1.3.0",
     "status": "review",
     "tutorialUrl": "papers/unlimited_ocr_works/"
+  },
+  {
+    "paperName": "videoagent_all_in_one_framework_for_video_understanding_and_editing",
+    "title": "VideoAgent: All-in-One Framework for Video Understanding and Editing",
+    "authors": [
+      "Hengji Zhou",
+      "Lingxuan Huang",
+      "Jian Wang",
+      "Bing Zhou",
+      "Si Wu",
+      "Lianghao Xia",
+      "Chao Huang"
+    ],
+    "year": 2026,
+    "venue": "arXiv",
+    "paperUrl": "https://arxiv.org/abs/2606.23327",
+    "participants": [
+      {
+        "name": "李雪彤",
+        "github": "snowietongl-boop"
+      }
+    ],
+    "topics": [
+      "Video Understanding",
+      "Video Editing",
+      "Multi-Agent Systems"
+    ],
+    "skillVersion": "1.0.0",
+    "status": "review",
+    "tutorialUrl": "papers/videoagent_all_in_one_framework_for_video_understanding_and_editing/"
   },
   {
     "paperName": "what_makes_prompts_a_graph_necessary_and_sufficient_conditions_for_prompt_graph_engineering",
