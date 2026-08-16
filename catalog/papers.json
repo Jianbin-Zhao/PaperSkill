@@ -204,6 +204,8 @@
     "skillVersion": "1.3.0",
     "status": "review",
     "tutorialUrl": "papers/joyai_image_awaking_spatial_intelligence_in_unified_multimodal_understanding_and_generation/"
+  },
+  {
     "paperName": "longcat_video_avatar_1_5_technical_report",
     "title": "LongCat-Video-Avatar 1.5 Technical Report",
     "authors": [
