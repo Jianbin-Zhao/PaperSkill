@@ -95,6 +95,24 @@
     "tutorialUrl": "papers/bwm_a_low_cost_high_fidelity_world_simulator_for_robot_learning/"
   },
   {
+    "paperName": "colleague_skill_automatedaiskill_generation_via_expert_knowledge_distillation",
+    "title": "COLLEAGUE.SKILL: Automated AI Skill Generation via Expert Knowledge Distillation",
+    "authors": [],
+    "year": null,
+    "venue": "",
+    "paperUrl": "https://arxiv.org/abs/2605.31264",
+    "participants": [
+      {
+        "name": "何世都",
+        "github": "Euler-H"
+      }
+    ],
+    "topics": [],
+    "skillVersion": "1.3.0",
+    "status": "review",
+    "tutorialUrl": "papers/colleague_skill_automatedaiskill_generation_via_expert_knowledge_distillation/"
+  },
+  {
     "paperName": "cosmos_3_omnimodal_world_models_for_physical_ai",
     "title": "Cosmos 3: Omnimodal World Models for Physical AI",
     "authors": [],
