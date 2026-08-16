@@ -401,6 +401,24 @@
     "tutorialUrl": "papers/mage_vl/"
   },
   {
+    "paperName": "omnieeg_bench_a_standardized_evaluation_benchmark_for_eeg_foundation_models",
+    "title": "OmniEEG-Bench: A Standardized Evaluation Benchmark for EEG Foundation Models",
+    "authors": [],
+    "year": null,
+    "venue": "",
+    "paperUrl": "https://arxiv.org/abs/2606.00815",
+    "participants": [
+      {
+        "name": "王为",
+        "github": "ekshub"
+      }
+    ],
+    "topics": [],
+    "skillVersion": "1.3.0",
+    "status": "review",
+    "tutorialUrl": "papers/omnieeg_bench_a_standardized_evaluation_benchmark_for_eeg_foundation_models/"
+  },
+  {
     "paperName": "opencompass_a_universal_evaluation_platform_for_large_language_models",
     "title": "OpenCompass: A Universal Evaluation Platform for Large Language Models",
     "authors": [],
@@ -417,6 +435,46 @@
     "skillVersion": "1.3.0",
     "status": "review",
     "tutorialUrl": "papers/opencompass_a_universal_evaluation_platform_for_large_language_models/"
+  },
+  {
+    "paperName": "optimize_anything_a_universal_api_for_optimizing_any_text_parameter",
+    "title": "optimize_anything: A Universal API for Optimizing any Text Parameter",
+    "authors": [
+      "Lakshya A Agrawal",
+      "Donghyun Lee",
+      "Shangyin Tan",
+      "Wenjie Ma",
+      "Karim Elmaaroufi",
+      "Rohit Sandadi",
+      "Sanjit A. Seshia",
+      "Koushik Sen",
+      "Dan Klein",
+      "Ion Stoica",
+      "Joseph E. Gonzalez",
+      "Omar Khattab",
+      "Alexandros G. Dimakis",
+      "Matei Zaharia"
+    ],
+    "year": 2026,
+    "venue": "CAIS 2026",
+    "paperUrl": "https://arxiv.org/pdf/2605.19633",
+    "participants": [
+      {
+        "name": "林盛森",
+        "github": "le-77-rrg"
+      }
+    ],
+    "topics": [
+      "LLM optimization",
+      "text artifacts",
+      "side information",
+      "Pareto search",
+      "multi-task transfer",
+      "agent systems"
+    ],
+    "skillVersion": "1.3.0",
+    "status": "review",
+    "tutorialUrl": "papers/optimize_anything_a_universal_api_for_optimizing_any_text_parameter/"
   },
   {
     "paperName": "paddleocr_vl_1_6_expanding_the_frontier_of_document_parsing_with_under_optimized_region_refinement_and_progressive_post_training",
