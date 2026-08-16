@@ -117,22 +117,23 @@
     "title": "Cosmos 3: Omnimodal World Models for Physical AI",
     "authors": [],
     "year": 2026,
-    "venue": "arXiv",
-    "paperUrl": "https://arxiv.org/abs/2606.02800",
+    "venue": "Technical Report",
+    "paperUrl": "https://arxiv.org/abs/2607.04508",
     "participants": [
       {
-        "name": "梁朝阳",
-        "github": "Zhaoyang-Liang"
+        "name": "ZhuXiongxiong",
+        "github": "rainy-season-not-dividing"
       }
     ],
     "topics": [
-      "Multimodal",
-      "World Models",
-      "Physical AI"
+      "Autonomous Research",
+      "Multi-Agent Systems",
+      "AI Safety",
+      "Research Automation"
     ],
     "skillVersion": "1.3.0",
     "status": "review",
-    "tutorialUrl": "papers/cosmos_3_omnimodal_world_models_for_physical_ai/"
+    "tutorialUrl": "papers/compressing_the_validation_bottleneck_an_agentic_self_driving_lab_for_scientific_discovery/"
   },
   {
     "paperName": "discrete_meanflow_training_curriculum",
