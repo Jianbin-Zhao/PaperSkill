@@ -3,8 +3,10 @@ import type { WidgetProps } from './registry';
 import { C, useCanvas, rounded, label, arrow, token, pacedPhase } from './studio-kit';
 export const HeroContrast: React.FC<WidgetProps> = ({ moduleId }) => {
   const isOld = moduleId === 'old';
+  const startedAt = React.useRef<number | null>(null);
   const ref = useCanvas((ctx, time) => {
-    const p = pacedPhase(time, 20000);
+    if (startedAt.current === null) startedAt.current = time;
+    const p = pacedPhase(time - startedAt.current, 18000);
     ctx.clearRect(0, 0, 360, 190); ctx.fillStyle = C.bg; ctx.fillRect(0, 0, 360, 190);
     if (isOld) {
       ['理解', '视频', '控制'].forEach((n, i) => {
@@ -13,8 +15,14 @@ export const HeroContrast: React.FC<WidgetProps> = ({ moduleId }) => {
         if (i < 2) arrow(ctx, 107 + i * 112, 97, 130 + i * 112, 97, i === 1 ? C.red : C.muted, 2);
       });
       const stage = Math.min(2, Math.floor(p * 3));
-      const lines = ['杯子·位置·目标', '杯子·目标', '目标'];
-      token(ctx, 31 + stage * 112, 29, 70, lines[stage], stage === 2 ? 'noisy' : 'clean');
+      const tokenX = 31 + stage * 112;
+      token(ctx, tokenX, 29, 70, '', stage === 2 ? 'noisy' : 'clean');
+      if (stage === 0) {
+        label(ctx, '杯子 · 位置', tokenX + 35, 43, C.ink, 10);
+        label(ctx, '目标', tokenX + 35, 58, C.ink, 10);
+      } else {
+        label(ctx, stage === 1 ? '杯子 · 目标' : '目标', tokenX + 35, 50, C.ink, stage === 1 ? 10 : 12);
+      }
       if (stage === 2) label(ctx, '线索丢失', 292, 149, C.red, 12);
     } else {
       rounded(ctx, 27, 69, 132, 58, 10, '#eef4fb', C.blue); rounded(ctx, 202, 69, 132, 58, 10, '#f5f0ff', C.purple);
