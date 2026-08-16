@@ -31,3 +31,12 @@ npm run preview   # 预览构建结果
 - `--orange` 用户强调，`--purple` 辅助机制
 
 切勿把 `--accent` 重新定义成别的语义角色。
+
+## 素材来源
+
+- `public/images/fig1.png`、`public/images/fig2.png`：来自论文 *TriAttention: Efficient Long Reasoning with Trigonometric KV Compression*（arXiv:2604.04921）Figure 1 / Figure 2，用于教学说明。
+- `public/images/deepseek_price.png`：DeepSeek 开放平台 API 定价页截图（输入缓存命中/未命中价格），用于讲解 KV 缓存价值，仅作教学示例。
+- `public/images/video1.mp4`：AI 生成的示意动画视频（传统方法在旋转后空间的过程演示），由参与者自制，用于教学。
+- `src/data/tutorial.ts` 中 Bilibili 推荐视频：来自 B 站公开视频，仅作学习参考。
+
+以上素材均仅用于本教程教学展示；如需商用或转载，请自行确认相应版权与授权。
