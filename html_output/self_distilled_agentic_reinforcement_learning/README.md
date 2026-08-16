@@ -31,3 +31,9 @@ npm run preview   # 预览构建结果
 - `--orange` 用户强调，`--purple` 辅助机制
 
 切勿把 `--accent` 重新定义成别的语义角色。
+
+## 页面预览
+
+![SDAR 交互式教程首页](public/images/preview.png)
+
+核心交互包括 Teacher–Student Gap 概率尺、token-level sigmoid gate、SDAR 双路径训练流程和实验结果对比。页面中的图形均由 React、CSS 与 Canvas 绘制，不使用未经授权的外部论文图片。
