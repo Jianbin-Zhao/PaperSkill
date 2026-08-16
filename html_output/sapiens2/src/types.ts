@@ -43,6 +43,7 @@ export interface SymbolDef {
 export interface FormulaDef {
   lead: string; // plain-language lead-in (Simplified Chinese)
   unicode: string; // Unicode/HTML formula, no KaTeX
+  latex?: string; // optional KaTeX source for presentation mode
   symbols: SymbolDef[];
 }
 
@@ -71,15 +72,33 @@ export interface Takeaway {
 export interface ChapterDef {
   kind: 'chapter';
   id: string; // e.g. "chap-1"
+  indexLabel: string; // compact slide index label, at most four Chinese characters
   title: string;
   badge: Badge;
   badgeLabel: string;
   bridge: string; // "本节作用" copy
   analogy: AnalogyCard;
   modules: ModuleDef[];
+  paperFigures?: FigureRef[];
   insight?: string;
   formula?: FormulaDef;
   takeaways: Takeaway[];
+  durationSeconds?: number;
+  speakerNote?: string;
+  layoutNote?: string;
+  animationNote?: string;
+}
+
+export interface BackupSlideDef {
+  kind: 'backup';
+  id: string;
+  indexLabel: string;
+  title: string;
+  bridge: string;
+  speakerNote: string;
+  layoutNote: string;
+  animationNote: string;
+  module: ModuleDef;
 }
 
 export interface BiliDef {
@@ -99,4 +118,5 @@ export interface TutorialData {
   hero: HeroConfig;
   chapters: ChapterDef[];
   bilibili?: BiliDef[];
+  backupSlides?: BackupSlideDef[];
 }

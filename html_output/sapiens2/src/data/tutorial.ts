@@ -2,533 +2,199 @@ import type { TutorialData } from '../types';
 
 export const tutorial: TutorialData = {
   meta: {
-    titleEn: "Sapiens2",
-    titleZh: "Sapiens2：从人体视觉的细节缺口到语义与 4K 协同",
-    venue: "ICLR 2026",
-    authors: "Rawal Khirodkar, He Wen, Julieta Martinez, Yuan Dong, Su Zhaoen, Shunsuke Saito",
-    affiliation: "Meta Reality Labs",
-    domain: "人类中心视觉｜自监督预训练｜高分辨率密集预测",
-    coreProblem: "上一代的高分辨率 MAE 路线擅长保留外观，但人体密集理解还需要稳定的跨视图语义，以及能承受 4K token 数量的上下文计算。",
-    coreInsight: "Sapiens2 不是单纯把 Sapiens 做大：它联合掩码重建与学生—教师对比自蒸馏，扩展 Humans-1B，并用分层注意力把高分辨率上下文推向 4K。",
-    keywords: [
-      "掩码重建",
-      "对比自蒸馏",
-      "4K视觉Transformer"
-    ]
+    titleEn: 'From Sapiens to Sapiens2',
+    titleZh: '人体视觉基础模型如何从像素重建走向全局语义理解',
+    venue: '5 分 40 秒交互式学术课件',
+    authors: 'Rawal Khirodkar 等',
+    affiliation: 'Meta Reality Labs',
+    domain: '人体中心视觉｜MAE｜自蒸馏｜高分辨率 Transformer',
+    coreProblem: '人体视觉既要看清局部细节，也要建立跨视图的整体语义。',
+    coreInsight: '人体专属数据决定学什么，MAE 高效学习细节，自蒸馏补充全局语义。',
+    keywords: ['Humans-300M/1B', 'MAE', 'Self-distillation'],
   },
   hero: {
-    oldMethod: {
-      desc: "<strong>前代 Sapiens：</strong>在 Humans-300M 上以高分辨率 MAE 为核心，建立人类中心密集预测 backbone。",
-      componentId: "portrait-hero"
-    },
-    newMethod: {
-      desc: "<strong>Sapiens2：</strong>联合 MAE 与自蒸馏对比学习，使用 Humans-1B；原生 1K，并提供层次化 4K 变体。",
-      componentId: "portrait-hero"
-    }
+    oldMethod: { desc: 'Sapiens v1：人体专属数据 + 高分辨率 MAE。' },
+    newMethod: { desc: 'Sapiens2：保留细节，并补充跨视图全局语义。' },
   },
   chapters: [
     {
-      kind: "chapter",
-      id: "chap-1",
-      title: "为什么需要 Sapiens2：把前代缺口连到新设计",
-      badge: "inf",
-      badgeLabel: "推理基础",
-      bridge: "先建立对照：Sapiens 已证明人类中心、高分辨率 MAE 很强；Sapiens2 则试图补上跨视图语义与更大尺度上下文这两块拼图。",
-      analogy: {
-        title: "一只眼睛，两种要求",
-        text: "橡皮只擦一处红色污点。擦得太粗，眼睛轮廓会消失；只看大概，又会漏掉睫毛。",
-        componentId: "portrait-scene"
-      },
-      modules: [
-        {
-          kind: "module",
-          id: "1.1",
-          title: "按三个维度比较两代模型",
-          desc: "依次切换预训练信号、数据与分辨率。<strong>左侧是前代路线，右侧是 Sapiens2 的系统升级。</strong>动画用于解释设计关系；图中不是性能刻度。",
-          componentId: "sapiens-comparison",
-          figure: "/images/sapiens-evolution.png"
-        },
-        {
-          kind: "module",
-          id: "1.2",
-          title: "从问题缺口走到设计回应",
-          desc: "点击每一项挑战，沿着 <strong>旧问题 → Sapiens2 的回应</strong> 阅读。这里解释作者的设计动机，不把它误读为每个模块已被单独验证的因果结论。",
-          componentId: "why-sapiens2"
-        }
+      kind: 'chapter',
+      id: 'page-1',
+      indexLabel: '五类任务',
+      title: '一张人体图像，需要理解什么？',
+      badge: 'inf',
+      badgeLabel: '主讲 1/7',
+      durationSeconds: 25,
+      bridge: '人体视觉不仅要识别人，还要理解结构、边界、三维几何与材质。',
+      modules: [{ kind: 'module', id: '1.1', title: '从原图到五种人体理解输出', desc: '使用论文真实图像演示 Pose、Segmentation、Pointmap、Normal 与 Albedo；点击任务可停留。', componentId: 'task-carousel' }],
+      paperFigures: [
+        { src: './paper/sapiens-v1-tasks.png', alt: 'Sapiens v1 原始人体图像及姿态、分割、深度和法线输出', caption: 'Sapiens Figure 1｜同一人体输入对应 Pose、Segmentation、Depth 与 Normal 输出。' },
+        { src: './paper/sapiens2-posttraining-annotations.png', alt: 'Sapiens2 第六页顶部的后训练标注论文原图', caption: 'Sapiens2 Figure 6｜308 关键点、29 类分割，以及 Pointmap、Normal、Albedo 的高保真合成输入与输出。' },
       ],
-      insight: "关键阅读法：Sapiens2 同时更换了目标、数据、模型规模、架构与部分任务配置。结果能支持“完整系统更强”，却不能只凭总分数分离每一项升级的独立贡献。",
-      takeaways: [
-        {
-          icon: "🎯",
-          title: "前代基础",
-          desc: "Sapiens 的 Humans-300M、原生 1K 与 MAE 路线奠定人类中心 backbone。"
-        },
-        {
-          icon: "🔧",
-          title: "新一代动机",
-          desc: "Sapiens2 要同时保留高保真外观与跨视图人体语义，并把上下文扩到 4K。"
-        },
-        {
-          icon: "✨",
-          title: "保留证据边界",
-          desc: "这是特定人体视觉系统的设计与结果，不是对所有视觉任务的普遍因果定律。"
-        }
-      ]
+      insight: '同一个人体 backbone，要能迁移到结构、区域、几何和材质任务。',
+      analogy: { title: '', text: '' },
+      takeaways: [],
+      layoutNote: '左侧为论文原始输入，右侧为论文批注或任务输出，并配合任务释义卡片。',
+      animationNote: '五种论文图片约每 1.8 秒自动切换；点击任意任务后停留。',
+      speakerNote: '人体视觉模型面对的并不是单一识别任务。同一张图像，它既要定位关节，区分身体部位，还要理解三维位置、表面朝向和材质颜色。两篇 Sapiens 论文试图建立一个可以统一迁移到这些任务的人体视觉基础模型。',
     },
     {
-      kind: "chapter",
-      id: "chap-2",
-      title: "一十亿张人像从哪里来",
-      badge: "inf",
-      badgeLabel: "推理基础",
-      bridge: "Sapiens2 把前代 Humans-300M 扩展为 Humans-1B。数据不是背景数字：它与训练目标、模型规模一起构成完整系统的一部分。",
-      analogy: {
-        title: "挑一块能看清的参考",
-        text: "放大镜在一张肖像纸上移动，只框住清晰、人物突出的区域。",
-        componentId: "portrait-scene"
-      },
-      modules: [
-        {
-          kind: "module",
-          id: "2.1",
-          title: "拖动筛选框",
-          desc: "在清晰人物、文字遮挡和人物过小之间选择。筛选条件服务于高质量人类中心预训练，不等同于下游任务标签；它也不能替代对数据规模独立贡献的对照实验。",
-          componentId: "portrait-lab"
-        }
-      ],
-      takeaways: [
-        {
-          icon: "🎯",
-          title: "候选不是训练集",
-          desc: "论文从约 40 亿候选中构建约 10 亿高质量人类图像；前代对照为 Humans-300M。"
-        },
-        {
-          icon: "🔧",
-          title: "质量与平衡",
-          desc: "过滤、去重、聚类和选择性采样共同塑造训练分布。"
-        },
-        {
-          icon: "✨",
-          title: "适用范围",
-          desc: "阅读结果时须记住：论文没有用同训练预算的 300M vs 1B 完整因子对照来隔离数据量贡献。"
-        }
-      ]
+      kind: 'chapter',
+      id: 'page-2',
+      indexLabel: '人体数据',
+      title: 'Sapiens v1 的核心方案',
+      badge: 'inf',
+      badgeLabel: '主讲 2/7',
+      durationSeconds: 45,
+      bridge: 'Sapiens v1 首先证明：人体基础模型需要人体中心数据。',
+      modules: [{ kind: 'module', id: '2.1', title: '数据域决定学到什么', desc: '依次点击四个流程框，查看论文中的数据、预训练、模型规模与下游任务细节。', componentId: 'v1-pipeline' }],
+      paperFigures: [{ src: './paper/sapiens-v1-data-ablation.png', alt: 'Sapiens v1 不同预训练数据源消融表', caption: 'Sapiens Table 7｜Human-100M 在同等数据量下优于 General-100M。' }],
+      insight: '同等数据量下，人体专属数据比通用图像更适合人体任务。',
+      analogy: { title: '', text: '' },
+      takeaways: [],
+      layoutNote: '上方横向流程，下方随所选节点呈现对应的原论文事实与表格。',
+      animationNote: '流程节点自动演示；点击任意节点后停留，并允许继续点击切换。',
+      speakerNote: 'Sapiens v1 的核心不是单纯扩大模型，而是使用人体专属数据进行高分辨率预训练。它从约十亿候选图像中构建 Humans-300M，并在原生 1024 分辨率下训练最大二十亿参数的 ViT。最有说服力的证据是：数据量相同的情况下，Humans-100M 在姿态、解析和法线任务上都明显优于 General-100M。这说明预训练数据与人体任务的领域对齐，比单纯增加通用图像更重要。',
     },
     {
-      kind: "chapter",
-      id: "chap-3",
-      title: "为什么两种目标要一起学",
-      badge: "inf",
-      badgeLabel: "推理基础",
-      bridge: "数据准备好后，核心问题回到表示本身：怎样既把图像锚在像素细节上，又让不同视角的语义对齐？这正是前代纯 MAE 路线希望补强的地方。",
-      analogy: {
-        title: "对齐两张参考线",
-        text: "铅笔只对齐一个轮廓目标：不忘纸上的线，也让不同参考视角指向同一人物。",
-        componentId: "portrait-scene"
-      },
-      modules: [
-        {
-          kind: "module",
-          id: "3.1",
-          title: "三种学习视角",
-          desc: "切换只重建、只对比和联合，查看外观细节与跨视图语义怎样被同时呈现。该交互是概念模型，不是论文给出的逐模块性能消融。",
-          componentId: "portrait-lab"
-        }
-      ],
+      kind: 'chapter',
+      id: 'page-3',
+      indexLabel: '遮挡重建',
+      title: 'MAE 如何学习人体细节',
+      badge: 'both',
+      badgeLabel: '核心交互 1',
+      durationSeconds: 60,
+      bridge: '遮掉 75% patch，只编码可见部分，再重建缺失区域。',
+      modules: [{ kind: 'module', id: '3.1', title: '遮挡—编码—重建', desc: '六个阶段节点均可点击：跳转后暂停，再次点击当前节点继续播放。', componentId: 'mae-animation' }],
+      paperFigures: [{ src: './paper/sapiens-v1-mae-reconstruction.png', alt: 'Sapiens v1 对未见人体图像进行不同遮挡率重建的论文原图', caption: 'Sapiens Figure 3｜75%–95% 遮挡率下的未见图像重建结果。' }],
       formula: {
-        lead: "两种约束写在同一个训练目标里。",
-        unicode: "L = Lₘₐₑ + λL꜀ₗ",
-        symbols: [
-          {
-            sym: "Lₘₐₑ",
-            desc: "掩码重建损失"
-          },
-          {
-            sym: "L꜀ₗ",
-            desc: "跨视图对比损失"
-          },
-          {
-            sym: "λ",
-            desc: "两项之间的相对权重"
-          }
-        ]
+        lead: '以 1024×1024、patch size 16 为例：',
+        unicode: 'N=4096，Nvisible=1024，LMAE=(1/|M|)Σp∈M||x̃p−x̂p||²₂',
+        latex: String.raw`\begin{aligned}N&=\frac{1024}{16}\times\frac{1024}{16}=4096,\\N_{\mathrm{visible}}&=(1-0.75)\times4096=1024,\\\mathcal L_{\mathrm{MAE}}&=\frac{1}{|M|}\sum_{p\in M}\|\tilde{x}^{p}-\hat{x}^{p}\|_2^2.\end{aligned}`,
+        symbols: [{ sym: 'M', desc: '被遮挡的 patch 集合' }, { sym: 'x̃', desc: '归一化目标 patch' }, { sym: 'x̂', desc: 'decoder 重建 patch' }],
       },
-      takeaways: [
-        {
-          icon: "🎯",
-          title: "两项职责不同",
-          desc: "重建锚定外观，对比整理跨视图语义。"
-        },
-        {
-          icon: "🔧",
-          title: "联合训练",
-          desc: "论文把它们写成一个总损失。"
-        },
-        {
-          icon: "✨",
-          title: "不要跳过协议",
-          desc: "具体收益须回到论文的任务、评测设置与完整系统证据。"
-        }
-      ]
+      insight: '能重建合理人体，说明学到了结构先验，不等于记住真实像素。',
+      analogy: { title: '', text: '' },
+      takeaways: [],
+      layoutNote: '使用 Sapiens Figure 3 的 Ground Truth、Mask Ratio 75% 与 MAE Reconstruction 原图，叠加 encoder、mask token、decoder 和 masked loss 中文标注。',
+      animationNote: '约 14 秒自动播放；六个节点可跳转并停留，再次点击当前节点从该阶段继续。',
+      speakerNote: 'MAE 首先把图像切成 patch，并随机移除其中百分之七十五。对于 1024 乘 1024 的图像，原本有 4096 个 patch，但编码器只处理其中 1024 个。解码器随后根据可见上下文恢复缺失区域，而且损失只在被遮挡的位置计算。由于真实内容已经被移除，模型必须学习人体比例、姿态关系、服饰纹理和身体边界，才能完成重建。它的优势是既能学习细粒度结构，又显著降低高分辨率编码的计算量。但重建出一个合理人体不等于恢复了真实内容，它证明的是人体结构先验，而不是像素级事实记忆。',
     },
     {
-      kind: "chapter",
-      id: "chap-4",
-      title: "掩码重建怎样守住细节",
-      badge: "both",
-      badgeLabel: "推理与训练",
-      bridge: "联合目标的第一项是掩码重建。现在沿着一个被遮住的 patch，看看误差究竟在哪里计算。",
-      analogy: {
-        title: "补回被遮住的一笔",
-        text: "纸条挡住一小段睫毛，铅笔根据周围轮廓补回它。",
-        componentId: "portrait-scene"
-      },
-      modules: [
-        {
-          kind: "module",
-          id: "4.1",
-          title: "走过掩码集合",
-          desc: "用上一步和下一步依次查看可见 token、mask token、decoder 重建，以及只在 M 上计误差。",
-          componentId: "portrait-lab"
-        }
+      kind: 'chapter',
+      id: 'page-4',
+      indexLabel: '语义瓶颈',
+      title: 'v1 的贡献与遗留问题',
+      badge: 'inf',
+      badgeLabel: '主讲 4/7',
+      durationSeconds: 35,
+      bridge: '能够重建人体，是否等于真正理解人体语义？',
+      modules: [{ kind: 'module', id: '4.1', title: 'MAE 擅长什么，又没有直接优化什么', desc: '局部纹理与结构很强；跨视图语义一致性不是直接训练目标。', componentId: 'mae-gap' }],
+      paperFigures: [
+        { src: './paper/sapiens2-knn-semantics.png', alt: 'Sapiens 与 Sapiens2 的最近邻检索对比', caption: 'Sapiens2 Figure 2｜[CLS] 最近邻更按人体语义聚类。' },
+        { src: './paper/sapiens2-human-attention.png', alt: 'Sapiens2 人体中心注意力可视化', caption: 'Sapiens2 Figure 3｜末层 [CLS] 注意力自然聚焦人体区域。' },
       ],
+      insight: '从局部重建走向跨视图语义，是 Sapiens2 的核心问题。',
+      analogy: { title: '', text: '' },
+      takeaways: [],
+      layoutNote: '左右对照三组问题，中央突出“重建是否等于理解”的过渡句。',
+      animationNote: '三组问题自动轮换高亮；不设置必需操作。',
+      speakerNote: 'v1 的 MAE 主要优化像素重建，因此擅长局部纹理、边界和结构。但是，跨视图语义一致性并不是它的直接训练目标。例如，只看到一只手或一个局部裁剪时，模型是否仍能形成与完整人体一致的语义表示？这正是 Sapiens2 要解决的问题。',
+    },
+    {
+      kind: 'chapter',
+      id: 'page-5',
+      indexLabel: '自蒸馏',
+      title: 'Sapiens2 的核心：自蒸馏对比学习',
+      badge: 'both',
+      badgeLabel: '核心交互 2',
+      durationSeconds: 80,
+      bridge: 'MAE 问“缺失区域长什么样”，自蒸馏问“整体与局部是否表达同一语义”。',
+      modules: [{ kind: 'module', id: '5.1', title: 'Student–Teacher 跨视图蒸馏', desc: '从论文 Figure 4 的同一人物原图裁出 2 个 global views 与 4 个 local views；蓝色 Student，橙色虚线 Teacher。', componentId: 'distillation-animation' }],
+      paperFigures: [{ src: './paper/sapiens2-pretraining.png', alt: 'Sapiens2 联合 MAE 与对比自蒸馏的论文方法图', caption: 'Sapiens2 Figure 4｜MAE 像素重建与 Student–Teacher 全局对比目标的联合预训练。' }],
       formula: {
-        lead: "论文把归一化目标与重建输出的误差只在被遮住的位置平均。",
-        unicode: "Lₘₐₑ = (1/V)Σᵢ(1/|Mᵢ|)Σₚ∈Mᵢ ||x̃ᵢᵖ − x̂ᵢᵖ||²",
-        symbols: [
-          {
-            sym: "Mᵢ",
-            desc: "第 i 个视图中被遮住的 token 集合"
-          },
-          {
-            sym: "x̃",
-            desc: "归一化目标 patch"
-          },
-          {
-            sym: "x̂",
-            desc: "decoder 重建 patch"
-          }
-        ]
+        lead: 'Teacher 由 Student 的指数移动平均更新，联合目标同时保留细节与语义：',
+        unicode: 'θt←μθt+(1−μ)θs；L=LMAE+0.4LCL+0.04LKoLeo',
+        latex: String.raw`\begin{aligned}\theta_t&\leftarrow\mu\theta_t+(1-\mu)\theta_s,\\\mathcal L&=\mathcal L_{\mathrm{MAE}}+0.4\mathcal L_{\mathrm{CL}}+0.04\mathcal L_{\mathrm{KoLeo}}.\end{aligned}`,
+        symbols: [{ sym: 'θt', desc: 'EMA Teacher 参数' }, { sym: 'θs', desc: 'Student 参数' }, { sym: 'μ', desc: '指数移动平均系数' }],
       },
-      takeaways: [
-        {
-          icon: "🎯",
-          title: "误差看 M",
-          desc: "重建误差在被遮住 token 集合上平均。"
-        },
-        {
-          icon: "🔧",
-          title: "先编码可见部分",
-          desc: "mask token 在完整序列中补位，再交给 decoder。"
-        },
-        {
-          icon: "✨",
-          title: "守住细节",
-          desc: "这一项解释像素与纹理保真的来源。"
-        }
-      ]
+      insight: 'EMA、输出分布校准与 KoLeo 共同降低表示坍塌风险。',
+      analogy: { title: '', text: '' },
+      takeaways: [],
+      layoutNote: '左侧使用论文 Figure 4 人物原图生成 2 个全局裁剪和 4 个局部裁剪，中间为 Student/Teacher，右侧展示允许与禁用的监督边。',
+      animationNote: '15–18 秒自动播放；展示 global↔global、global→local、stop-gradient、EMA，仅保留播放/暂停。',
+      speakerNote: 'Sapiens2 保留 MAE，同时加入自蒸馏对比学习。同一张图像被裁剪为两个全局视图和四个局部视图。学生处理所有视图，教师主要从完整的全局视图形成稳定语义目标。随后，学生即使只看到手臂、头部或局部服饰，也要预测与完整人体一致的语义表示。教师不通过梯度更新，而是学生参数的指数移动平均，因此目标更加稳定。最终，MAE 负责局部细节，对比损失负责跨视图语义，KoLeo 则防止不同样本的特征过度聚集。',
     },
     {
-      kind: "chapter",
-      id: "chap-5",
-      title: "学生和教师怎样对齐语义",
-      badge: "both",
-      badgeLabel: "推理与训练",
-      bridge: "重建把表示拉回图像细节；对比自蒸馏则让同一人物的不同视角在全局表征上相遇。",
-      analogy: {
-        title: "把参考卡对准姿势",
-        text: "同一张人像换了角度，参考卡仍指向同一个姿势要点。",
-        componentId: "portrait-scene"
-      },
-      modules: [
-        {
-          kind: "module",
-          id: "5.1",
-          title: "选择视图对",
-          desc: "选择论文允许的 global-global 或 global-local 对；local-local 会明确提示为未进入该正对集合。",
-          componentId: "portrait-lab"
-        }
-      ],
+      kind: 'chapter',
+      id: 'page-6',
+      indexLabel: '六维升级',
+      title: 'Sapiens2 相对 v1 提升了什么',
+      badge: 'trn',
+      badgeLabel: '主讲 6/7',
+      durationSeconds: 50,
+      bridge: '升级不只来自对比损失，还包括数据、规模、架构、分辨率与任务。',
+      modules: [{ kind: 'module', id: '6.1', title: '六维升级矩阵与 4K 路线', desc: '从 Humans-300M/2B/1K，扩展到 Humans-1B/5B/分层 4K。', componentId: 'upgrade-matrix' }],
+      paperFigures: [{ src: './paper/sapiens2-4k-attention.png', alt: 'Sapiens2 4K 分层窗口注意力论文结构图', caption: 'Sapiens2 Figure 5｜先用窗口注意力压缩局部 token，再进行高层全局注意力。' }],
       formula: {
-        lead: "教师分布 q 以交叉熵监督学生分布 p。",
-        unicode: "L꜀ₗ = (1/|S|)Σ₍ᵢ,ⱼ₎∈S H(qⱼ,pᵢ)，H(q,p)=−Σₖqₖlog pₖ",
-        symbols: [
-          {
-            sym: "S",
-            desc: "论文定义的跨视图正样本对集合"
-          },
-          {
-            sym: "q",
-            desc: "EMA 教师的 softmax 分布"
-          },
-          {
-            sym: "p",
-            desc: "学生的 softmax 分布"
-          }
-        ]
+        lead: '4096×3072、patch size 16 时：',
+        unicode: 'N=(4096/16)(3072/16)=49152',
+        latex: String.raw`N=\frac{4096}{16}\times\frac{3072}{16}=49152.`,
+        symbols: [{ sym: 'N', desc: '4K 输入产生的视觉 token 数' }],
       },
-      takeaways: [
-        {
-          icon: "🎯",
-          title: "EMA 教师",
-          desc: "教师参数是学生参数的指数滑动平均。"
-        },
-        {
-          icon: "🔧",
-          title: "跨视图对齐",
-          desc: "论文使用 global-global 和 global-local 配对。"
-        },
-        {
-          icon: "✨",
-          title: "全局语义",
-          desc: "对比项不等于逐像素重建，它约束的是表征分布。"
-        }
-      ]
+      insight: '直接全局注意力成本过高：先局部窗口建模，再做高层全局交互。',
+      analogy: { title: '', text: '' },
+      takeaways: [],
+      layoutNote: '左侧六维升级矩阵，右侧小型 4K 局部窗口到全局交互动画。',
+      animationNote: '矩阵按行自动高亮，4K 路线自动循环；允许点击行高亮，不要求操作。',
+      speakerNote: '因此，Sapiens2 并不是只增加了对比损失。它把数据扩展到十亿级，模型扩展到五十亿参数，同时加入更稳定的 Transformer 设计和分层 4K 表示。在任务上，它用 Pointmap 扩展完整三维坐标预测，并增加 Albedo 材质估计。最核心的能力变化，是从偏重局部像素细节，升级为同时具备全局人体语义。',
     },
     {
-      kind: "chapter",
-      id: "chap-6",
-      title: "λ 不是一个魔法旋钮",
-      badge: "both",
-      badgeLabel: "推理与训练",
-      bridge: "两项都在总损失中出现，但权重符号不应被误读成脱离数据和训练配置的万能答案。",
-      analogy: {
-        title: "调一笔的轻重",
-        text: "笔压改变一条线的存在感，它类比两项目标的相对强调，而不是论文公布的固定处方。",
-        componentId: "portrait-scene"
-      },
-      modules: [
-        {
-          kind: "module",
-          id: "6.1",
-          title: "选择强调方向",
-          desc: "切换更重重建、并重和更重对比，阅读 λ 在方程里的相对作用。控件只作概念演示。",
-          componentId: "portrait-lab"
-        }
-      ],
-      formula: {
-        lead: "λ 改变两个写入同一总损失的项的相对强调。",
-        unicode: "L = Lₘₐₑ + λL꜀ₗ",
-        symbols: [
-          {
-            sym: "λ",
-            desc: "对 L꜀ₗ 的相对权重；该论文段落未给出可外推的通用最优值"
-          }
-        ]
-      },
-      takeaways: [
-        {
-          icon: "🎯",
-          title: "权衡符号",
-          desc: "λ 表达两类约束的相对权重。"
-        },
-        {
-          icon: "🔧",
-          title: "不伪造最佳值",
-          desc: "教程不把机制演示误写成论文的最优超参数。"
-        },
-        {
-          icon: "✨",
-          title: "回到条件",
-          desc: "论文主文用 λ 表示相对强调；阅读实现或附录时，应把完整损失与训练配置一并核对。"
-        }
-      ]
+      kind: 'chapter',
+      id: 'page-7',
+      indexLabel: '证据边界',
+      title: '结果、证据边界与结论',
+      badge: 'both',
+      badgeLabel: '主讲 7/7',
+      durationSeconds: 45,
+      bridge: '完整系统显著更强，但不能把全部提升单独归因于自蒸馏。',
+      modules: [{ kind: 'module', id: '7.1', title: '三组结果，两层证据', desc: '只比较 1B 规模的 Pose、Segmentation 与 Normal 三组代表结果。', componentId: 'evidence-conclusion' }],
+      insight: 'Sapiens v1 让模型“看清人体”，Sapiens2 进一步让模型“理解人体”。',
+      analogy: { title: '', text: '' },
+      takeaways: [],
+      layoutNote: '上方三行结果表；下方绿色“较强证明”与橙色“未完全隔离”并列；结论置底。',
+      animationNote: '结果三行依次高亮，最后停在总结句；不要求评委操作。',
+      speakerNote: '总结来说，Sapiens v1 证明了人体专属数据和高分辨率 MAE 能建立强大的人体结构先验；Sapiens2 则通过自蒸馏补充跨视图全局语义，并进一步扩展到十亿级数据、五十亿参数、4K 表示和更多三维任务。但应注意，v2 同时改变了数据、模型、架构和训练目标，因此不能把全部性能提升归因于对比学习。两篇论文最值得借鉴的思想是：数据领域、预训练目标和下游任务所需的表示层次必须相互匹配。',
+    },
+  ],
+  backupSlides: [
+    {
+      kind: 'backup', id: 'backup-qkv', indexLabel: '注意力', title: '备用 1：自注意力与 QKV',
+      bridge: '只在答疑时解释 Query、Key、Value 如何组织 token 之间的信息交换。',
+      module: { kind: 'module', id: 'B1', title: 'QKV 速查', desc: '主讲不展开完整推导。', componentId: 'backup-panel' },
+      speakerNote: 'Query 表示当前 token 想寻找什么，Key 表示其他 token 提供什么索引，Value 是真正被聚合的信息。正式主线只需要理解注意力让局部或全局 token 交换信息。',
+      layoutNote: '三列 Q/K/V 与一条简化注意力流，不展示复杂矩阵推导。', animationNote: '静态答疑页，仅点击高亮。',
     },
     {
-      kind: "chapter",
-      id: "chap-7",
-      title: "高分辨率让哪些细节可见",
-      badge: "trn",
-      badgeLabel: "训练细节",
-      bridge: "视觉 token 越密，细微边界越可能被表达；但更多 token 也带来更大的计算负担。以 4096×3072、patch=16 为例，网格将产生 49,152 个 token。",
-      analogy: {
-        title: "放大一根发丝",
-        text: "放大镜沿着一根发丝移动，说明更密的视觉 token 能保留更细的轮廓。",
-        componentId: "portrait-scene"
-      },
-      modules: [
-        {
-          kind: "module",
-          id: "7.1",
-          title: "切换观察尺度",
-          desc: "按步骤从概览到 1K 再到 4K，观察 token 网格与人像边界的关系。",
-          componentId: "portrait-lab"
-        }
-      ],
-      formula: {
-        lead: "给定高度、宽度和 patch 大小，token 数由网格大小决定。",
-        unicode: "N = (H/p)(W/p)",
-        symbols: [
-          {
-            sym: "H,W",
-            desc: "输入图像高度与宽度"
-          },
-          {
-            sym: "p",
-            desc: "patch 大小"
-          },
-          {
-            sym: "N",
-            desc: "生成的视觉 token 数"
-          }
-        ]
-      },
-      takeaways: [
-        {
-          icon: "🎯",
-          title: "尺度改变 token 数",
-          desc: "图像分辨率是视觉计算量的重要来源。"
-        },
-        {
-          icon: "🔧",
-          title: "细节有成本",
-          desc: "若把所有 token 直接做全局注意力，计算会随 N² 增长；更高分辨率不是免费提升。"
-        },
-        {
-          icon: "✨",
-          title: "引出架构",
-          desc: "下一章解释 4K 如何组织局部和全局计算。"
-        }
-      ]
+      kind: 'backup', id: 'backup-collapse', indexLabel: '防坍塌', title: '备用 2：自蒸馏与表示坍塌',
+      bridge: 'EMA、输出分布校准和 KoLeo 共同降低所有图像收敛到同一表示的风险。',
+      module: { kind: 'module', id: 'B2', title: '为什么不会全部变成同一个向量？', desc: 'Centering 与 temperature 的数学细节只放在答疑。', componentId: 'backup-panel' },
+      speakerNote: '如果所有输入都输出同一个向量，自蒸馏会失去学习信号。EMA Teacher 提供平滑目标，输出分布校准控制分布偏置，KoLeo 鼓励不同样本在特征空间中保持分散。',
+      layoutNote: '左侧坍塌示意，右侧三项稳定机制。', animationNote: '静态答疑页，仅点击高亮。',
     },
     {
-      kind: "chapter",
-      id: "chap-8",
-      title: "4K 如何先看局部再看整体",
-      badge: "trn",
-      badgeLabel: "训练细节",
-      bridge: "4K 的关键不是把 49,152 个 token 一次性全局相连，而是先局部处理，再压缩，再聚合长程上下文。",
-      analogy: {
-        title: "先看局部，再看全脸",
-        text: "放大镜只扫描一个局部区域，目标却是把细节接回整张肖像。",
-        componentId: "portrait-scene"
-      },
-      modules: [
-        {
-          kind: "module",
-          id: "8.1",
-          title: "点击三段注意力路线",
-          desc: "点击 Win-SA、CLS 引导池化或 Global-SA，观察局部 token、压缩表示和全局上下文怎样交接。它解释 <strong>先局部、再压缩、后全局</strong> 的计算故事。",
-          componentId: "attention-story",
-          figure: "/images/hierarchical-attention.png"
-        },
-        {
-          kind: "module",
-          id: "8.2",
-          title: "把算力问题与视觉收益分开读",
-          desc: "分层注意力说明 4K <strong>如何可算</strong>；它本身不等于已经证明 4K 在所有任务上都有同等幅度的收益。请把视觉案例、任务指标与计算成本分开判断。",
-          componentId: "attention-story"
-        }
-      ],
-      formula: {
-        lead: "池化后，后续全局注意力面对的是缩短的序列。",
-        unicode: "N → N/ω",
-        symbols: [
-          {
-            sym: "N",
-            desc: "池化前的 token 数"
-          },
-          {
-            sym: "ω",
-            desc: "CLS 引导池化的空间步长"
-          }
-        ]
-      },
-      takeaways: [
-        {
-          icon: "🎯",
-          title: "先局部",
-          desc: "窗口注意力捕捉纹理和细边界。"
-        },
-        {
-          icon: "🔧",
-          title: "再压缩",
-          desc: "CLS 引导池化缩短后续全局计算面对的序列；N/ω 是教学化的长度示意。"
-        },
-        {
-          icon: "✨",
-          title: "后全局",
-          desc: "缩短后的序列再用全局注意力融合长程上下文；论文的完整成本收益仍须结合任务结果理解。"
-        }
-      ]
+      kind: 'backup', id: 'backup-metrics', indexLabel: '指标释义', title: '备用 3：指标怎么读',
+      bridge: 'mAP、mIoU 越高越好；Pointmap L2 与 Normal MAE 越低越好。',
+      module: { kind: 'module', id: 'B3', title: '四种指标方向', desc: '只解释方向和测量对象，不展开完整定义。', componentId: 'backup-panel' },
+      speakerNote: 'Pose mAP 衡量关键点检测质量，mIoU 衡量分割区域重合，Pointmap L2 衡量三维坐标误差，Normal MAE 衡量表面法线角度误差。',
+      layoutNote: '四张指标卡，明确标记向上或向下。', animationNote: '静态答疑页。',
     },
     {
-      kind: "chapter",
-      id: "chap-9",
-      title: "同一个 backbone 怎样服务五类任务",
-      badge: "trn",
-      badgeLabel: "训练细节",
-      bridge: "预训练 backbone 提供起点，但姿态、分割、点图、法线和反照率覆盖 2D 关键点、区域、几何与材质，仍各有不同的监督、输出和损失。",
-      analogy: {
-        title: "补上一种专用标记",
-        text: "同一张底稿，换一支笔就能标注关节、边界或表面方向；底稿不自动等于最终答案。",
-        componentId: "portrait-scene"
-      },
-      modules: [
-        {
-          kind: "module",
-          id: "9.1",
-          title: "选择任务头",
-          desc: "切换五个任务头，查看输出类型和论文所述的监督来源。",
-          componentId: "portrait-lab"
-        }
-      ],
-      takeaways: [
-        {
-          icon: "🎯",
-          title: "共享 backbone",
-          desc: "同一个 backbone 为五类任务提供起点，但不等于共享监督或共享评测。"
-        },
-        {
-          icon: "🔧",
-          title: "任务各有定义",
-          desc: "点图、法线和反照率与姿态、分割的输出和数据不同。"
-        },
-        {
-          icon: "✨",
-          title: "按协议理解",
-          desc: "每项后训练结果都需要对应其任务设定。"
-        }
-      ]
+      kind: 'backup', id: 'backup-limitations', indexLabel: '实验局限', title: '备用 4：局限性与实验混杂',
+      bridge: '数据、模型、架构、标签与目标同时变化，缺少完整因子化消融。',
+      module: { kind: 'module', id: 'B4', title: '什么还没有被单独证明？', desc: '把系统能力与单模块因果贡献分开。', componentId: 'backup-panel' },
+      speakerNote: 'Sapiens2 的完整系统明显更强，但现有实验没有完全隔离自蒸馏、Humans-1B、更大模型、架构变化和标签变化的独立贡献。',
+      layoutNote: '左侧“系统结论”，右侧“尚未隔离的变量”。', animationNote: '静态答疑页。',
     },
-    {
-      kind: "chapter",
-      id: "chap-10",
-      title: "结果要连同协议和方向读",
-      badge: "both",
-      badgeLabel: "结果与边界",
-      bridge: "最后一章不做“总分”。我们先区分冻结 backbone 的 dense probing 与任务后训练，再在同协议、同指标方向下阅读论文报告的数字。",
-      analogy: {
-        title: "为成稿落下画框",
-        text: "画框只包住一张完成的肖像，提醒每项分数都属于自己的任务和测试协议。",
-        componentId: "portrait-scene"
-      },
-      modules: [
-        {
-          kind: "module",
-          id: "10.1",
-          title: "切换两种证据层级",
-          desc: "选择 <strong>Dense probing</strong> 或<strong>任务后训练</strong>。每张卡都保留指标方向和表格/测试协议，避免把不同实验混成一个总分。",
-          componentId: "results-matrix"
-        }
-      ],
-      takeaways: [
-        {
-          icon: "🎯",
-          title: "方向不同",
-          desc: "mAP、mIoU 越高越好；L2、MAE、角度误差越低越好。"
-        },
-        {
-          icon: "🔧",
-          title: "协议不同",
-          desc: "dense probing 与完整后训练不是同一实验。"
-        },
-        {
-          icon: "✨",
-          title: "范围明确",
-          desc: "论文证明完整 Sapiens2 系统很强；由于多项设计同时变化，不能把总结果外推成任一单模块的独立因果结论。"
-        }
-      ]
-    }
-  ]
+  ],
 };

@@ -1,75 +1,133 @@
-import React, { useEffect } from 'react';
-import { tutorial } from './data/tutorial';
-import { Hero } from './components/Hero';
-import { FlowMini } from './components/FlowMini';
-import { ChapterBridge } from './components/ChapterBridge';
-import { AnalogyCard } from './components/AnalogyCard';
-import { Module } from './components/Module';
+import React, { useEffect, useState } from 'react';
 import { Formula } from './components/Formula';
-import { InsightBar } from './components/InsightBar';
-import { Takeaway } from './components/Takeaway';
-import { BiliVideos } from './components/BiliVideos';
-import { useProgressiveChapters } from './lib/useProgressiveChapters';
+import { PageDrawers } from './components/PageDrawers';
+import { PaperCover } from './components/PaperCover';
+import { tutorial } from './data/tutorial';
+import { widgetRegistry } from './modules/registry';
+import type { ChapterDef } from './types';
+
+function SlideIndex({ labels, current }: { labels: string[]; current: number }) {
+  return (
+    <div className="slide-index" aria-label="课件内容索引">
+      {labels.map((label, itemIndex) => (
+        <span
+          className={itemIndex === current ? 'active' : ''}
+          aria-current={itemIndex === current ? 'page' : undefined}
+          key={label}
+        >
+          {label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function SlideNavigation({ current, total, onMove, onSelect, hasIntro = false }: {
+  current: number;
+  total: number;
+  onMove: (delta: number) => void;
+  onSelect: (index: number) => void;
+  hasIntro?: boolean;
+}) {
+  return (
+    <nav className="slide-navigation" aria-label="课件翻页">
+      <div className="slide-navigation-actions">
+        <button onClick={() => onMove(-1)} disabled={current === 0 && !hasIntro}>返回学习</button>
+        <button onClick={() => onMove(1)} disabled={current === total - 1}>继续学习</button>
+      </div>
+      <div className="slide-page-dots" aria-label={`当前第 ${current + 1} 页，共 ${total} 页`}>
+        {Array.from({ length: total }, (_, dot) => (
+          <button
+            aria-label={`跳转到第 ${dot + 1} 页`}
+            aria-current={dot === current ? 'page' : undefined}
+            className={dot === current ? 'active' : ''}
+            onClick={() => onSelect(dot)}
+            key={dot}
+          />
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+function MainSlide({ page, index, labels, onMove, onSelect }: {
+  page: ChapterDef;
+  index: number;
+  labels: string[];
+  onMove: (delta: number) => void;
+  onSelect: (index: number) => void;
+}) {
+  const module = page.modules[0];
+  const Widget = module ? widgetRegistry[module.componentId] : undefined;
+  return (
+    <article className="deck-slide" aria-labelledby={`${page.id}-title`}>
+      <div className="slide-topline">
+        <SlideIndex labels={labels} current={index} />
+      </div>
+      <h1 id={`${page.id}-title`}>{page.title}</h1>
+      <p className="slide-thesis">{page.bridge}</p>
+      <section className="slide-stage">
+        <div className="stage-heading">
+          <span>{module?.id}</span>
+          <div><h2>{module?.title}</h2><p>{module?.desc}</p></div>
+        </div>
+        {Widget ? <Widget chapterId={page.id} moduleId={module.id} /> : null}
+      </section>
+      {page.formula ? <Formula formula={page.formula} /> : null}
+      {page.insight ? <div className="slide-conclusion">{page.insight}</div> : null}
+      <PageDrawers pageId={page.id} figures={page.paperFigures} />
+      <SlideNavigation current={index} total={labels.length} onMove={onMove} onSelect={onSelect} hasIntro />
+    </article>
+  );
+}
 
 export default function App() {
-  const total = tutorial.chapters.length;
-  const { revealed, begin, revealNext } = useProgressiveChapters(total);
-  const bili = tutorial.bilibili || [];
+  const [showCover, setShowCover] = useState(true);
+  const [mainIndex, setMainIndex] = useState(0);
+  const mainPages = tutorial.chapters;
+  const move = (delta: number) => {
+    if (showCover) {
+      if (delta > 0) setShowCover(false);
+      return;
+    }
+    if (delta < 0 && mainIndex === 0) {
+      setShowCover(true);
+      return;
+    }
+    setMainIndex((value) => Math.max(0, Math.min(mainPages.length - 1, value + delta)));
+  };
 
-  // Auto-scroll to the most recently revealed chapter so the "next chapter" button
-  // lands the new section in view instead of leaving it below the fold.
   useEffect(() => {
-    if (revealed < 1) return;
-    const ch = tutorial.chapters[revealed - 1];
-    if (!ch) return;
-    const el = document.getElementById(ch.id);
-    if (!el) return;
-    const id = requestAnimationFrame(() => {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-    return () => cancelAnimationFrame(id);
-  }, [revealed]);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowRight' || event.key === 'PageDown') move(1);
+      if (event.key === 'ArrowLeft' || event.key === 'PageUp') move(-1);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
 
   return (
-    <>
-      <Hero meta={tutorial.meta} hero={tutorial.hero} onStart={begin} started={revealed > 0} />
-      <main>
-        {tutorial.chapters.map((ch, idx) => {
-          const isVisible = revealed >= idx + 1;
-          if (!isVisible) return null;
-          const nextNum = idx + 2;
-          const isLast = idx === total - 1;
-          return (
-            <section className="chap" id={ch.id} key={ch.id}>
-              <h2 className="chap-title">
-                <span className="num">§{idx + 1}.</span>
-                {ch.title}
-                <span className={`badge-tag ${ch.badge}`}>{ch.badgeLabel}</span>
-              </h2>
-              <FlowMini total={total} revealed={revealed} />
-              <ChapterBridge text={ch.bridge} />
-              <AnalogyCard analogy={ch.analogy} chapterId={ch.id} />
-              {ch.modules.map((m) => (
-                <Module key={m.id} module={m} chapterId={ch.id} />
-              ))}
-              {ch.insight ? <InsightBar text={ch.insight} /> : null}
-              {ch.formula ? <Formula formula={ch.formula} /> : null}
-              <Takeaway items={ch.takeaways} />
-              {idx === revealed - 1 && !isLast ? (
-                <div className="chap-loader">
-                  <div className="chap-loader-hint" />
-                  <button className="chap-loader-btn" onClick={revealNext}>
-                    继续学习 §{nextNum} <span className="chap-loader-arrow">→</span>
-                  </button>
-                </div>
-              ) : isLast ? (
-                // End of the last chapter: append Bilibili recommendations here when present.
-                bili.length > 0 ? <BiliVideos items={bili} /> : null
-              ) : null}
-            </section>
-          );
-        })}
+    <div className="presentation-shell">
+      <header className="deck-header">
+        <div>
+          <span className="deck-eyebrow">SAPIENS → SAPIENS2</span>
+          <strong>{tutorial.meta.titleZh}</strong>
+        </div>
+      </header>
+
+      <main className="deck-main">
+        {showCover ? (
+          <PaperCover onStart={() => setShowCover(false)} />
+        ) : (
+          <MainSlide
+            page={mainPages[mainIndex]}
+            index={mainIndex}
+            labels={mainPages.map((page) => page.indexLabel)}
+            onMove={move}
+            onSelect={setMainIndex}
+          />
+        )}
       </main>
-    </>
+    </div>
   );
 }

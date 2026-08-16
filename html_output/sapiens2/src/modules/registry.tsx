@@ -1,12 +1,12 @@
 import React from 'react';
-import { ExampleSlider } from './exampleSlider';
-import { PortraitHero } from './portrait-hero';
-import { PortraitLab } from './portrait-lab';
-import { PortraitScene } from './portrait-scene';
-import { SapiensComparison } from './sapiens-comparison';
-import { WhySapiens2 } from './why-sapiens2';
-import { AttentionStory } from './attention-story';
-import { ResultsMatrix } from './results-matrix';
+import { TaskCarousel } from './task-carousel';
+import { V1Pipeline } from './v1-pipeline';
+import { MaeAnimation } from './mae-animation';
+import { MaeGap } from './mae-gap';
+import { DistillationAnimation } from './distillation-animation';
+import { UpgradeMatrix } from './upgrade-matrix';
+import { EvidenceConclusion } from './evidence-conclusion';
+import { BackupPanel } from './backup-panel';
 
 export interface WidgetProps {
   chapterId: string;
@@ -14,11 +14,11 @@ export interface WidgetProps {
 }
 
 export const widgetRegistry: Record<string, React.FC<WidgetProps>> = {};
-widgetRegistry['example-slider'] = ExampleSlider;
-widgetRegistry['portrait-hero'] = PortraitHero;
-widgetRegistry['portrait-lab'] = PortraitLab;
-widgetRegistry['portrait-scene'] = PortraitScene;
-widgetRegistry['sapiens-comparison'] = SapiensComparison;
-widgetRegistry['why-sapiens2'] = WhySapiens2;
-widgetRegistry['attention-story'] = AttentionStory;
-widgetRegistry['results-matrix'] = ResultsMatrix;
+widgetRegistry['task-carousel'] = TaskCarousel;
+widgetRegistry['v1-pipeline'] = V1Pipeline;
+widgetRegistry['mae-animation'] = MaeAnimation;
+widgetRegistry['mae-gap'] = MaeGap;
+widgetRegistry['distillation-animation'] = DistillationAnimation;
+widgetRegistry['upgrade-matrix'] = UpgradeMatrix;
+widgetRegistry['evidence-conclusion'] = EvidenceConclusion;
+widgetRegistry['backup-panel'] = BackupPanel;
